@@ -1,5 +1,5 @@
 import { getToken, getCurrentUser } from "../../core/auth.js";
-import { API_BASE_URL } from "../../core/config.js";
+import { API_BASE_URL, BACKEND_URL } from "../../core/config.js";
 
 const container = document.getElementById("postsContainer");
 function closeAllMenus() {
@@ -85,7 +85,7 @@ function createPostCard(post) {
       </div>
     </div>
 
-    ${post.image ? `<img src="${post.image}" class="post-image"/>` : ""}
+    ${post.image ? `<img src="${BACKEND_URL}${post.image}" class="post-image"/>` : ""}
 
     <div class="post-caption">
       <strong>${username}</strong> ${post.caption || ""}
