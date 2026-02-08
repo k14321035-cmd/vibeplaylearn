@@ -62,7 +62,7 @@ if (loginForm) {
       });
 
       // ✅ REDIRECT
-      window.location.replace("/frontend/pages/vibe.html");
+      window.location.replace("/pages/vibe.html");
 
     } catch (err) {
       // If the error message is a JSON string (from some potential server responses), parse it
