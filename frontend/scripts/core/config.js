@@ -5,3 +5,4 @@ export const BACKEND_URL = window.location.hostname === "localhost" || window.lo
 export const API_BASE_URL = `${BACKEND_URL}/api`;
 
 
+
