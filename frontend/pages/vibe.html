@@ -133,7 +133,7 @@
 
 
 <script type="module">
-import { API_BASE_URL } from "../scripts/core/config.js";
+import { API_BASE_URL, BACKEND_URL } from "../scripts/core/config.js";
 
 /* ===============================
    POST MODAL
@@ -143,6 +143,12 @@ function openPostModal() {
 }
 
 function closePostModal(e) {
+  // If called programmatically (no event), just close it
+  if (!e) {
+     document.getElementById("postModal").classList.remove("active");
+     return;
+  }
+  // If called via click, check target
   if (e.target.id === "postModal") {
     document.getElementById("postModal").classList.remove("active");
   }
@@ -188,7 +194,7 @@ async function fetchAndRenderPosts() {
             <span class="post-username">@${username}</span>
           </div>
 
-          ${post.image ? `<img src="${post.image}" class="post-media" />` : ""}
+          ${post.image ? `<img src="${BACKEND_URL}${post.image}" class="post-media" />` : ""}
 
           <div class="post-actions">
   <button onclick="likePost('${post._id}', this)">
