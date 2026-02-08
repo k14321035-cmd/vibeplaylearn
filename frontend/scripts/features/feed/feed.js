@@ -164,5 +164,5 @@ function formatTime(date) {
   return new Date(date).toLocaleString();
 }
 window.openChatFromFeed = function (userId) {
-  window.location.href = `/frontend/pages/messages.html?user=${userId}`;
+  window.location.href = `/pages/messages.html?user=${userId}`;
 };
