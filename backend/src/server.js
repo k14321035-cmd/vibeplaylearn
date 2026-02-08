@@ -4,6 +4,9 @@ import cors from "cors";
 import { Server } from "socket.io";
 import dotenv from "dotenv";
 
+import path from "path";
+import { fileURLToPath } from "url";
+
 import { connectDB } from "./config/db.js";
 
 import authRoutes from "./routes/auth.routes.js";
@@ -17,6 +20,9 @@ import { initTicTacToe } from "./games/tictactoe/ttt.socket.js";
 
 
 dotenv.config();
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
 
 const app = express();
 
@@ -37,6 +43,16 @@ app.use("/api/messages", messageRoutes);
 app.use("/uploads", express.static("uploads"));
 app.use("/api/stories", storyRoutes);
 app.use("/api/notifications", notificationRoutes);
+
+// SERVE FRONTEND (STATIC FILES)
+// Go up two levels from "backend/src" to "f:/website/zimig" then into "frontend"
+app.use(express.static(path.join(__dirname, "../../frontend")));
+
+// REDIRECT ROOT TO LOGIN
+app.get("/", (req, res) => {
+  res.redirect("/pages/login.html");
+});
+
 /* =========================
    SERVER + SOCKET
    ========================= */
