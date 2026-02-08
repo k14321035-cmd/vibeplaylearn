@@ -1,0 +1,304 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>VIBE – Learn Play</title>
+
+  <!-- Fonts -->
+  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;700;800&family=DM+Sans:wght@400;500;700&display=swap" rel="stylesheet">
+
+  <!-- Main Styles -->
+  <link rel="stylesheet" href="../styles/style1.css" />
+
+  <!-- FIX: Modal must not block clicks -->
+  <style>
+    .modal {
+      display: none;
+      position: fixed;
+      inset: 0;
+      background: rgba(0,0,0,0.6);
+      z-index: 1000;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .modal.active {
+      display: flex;
+    }
+
+    .post-card {
+      cursor: pointer;
+      pointer-events: auto;
+      position: relative;
+      z-index: 1;
+    }
+
+    .post-card:hover {
+      background: rgba(255,255,255,0.03);
+    }
+  </style>
+</head>
+
+<body>
+
+<!-- ================= HEADER ================= -->
+<header class="header">
+  <div class="header-content">
+    <div class="logo">VIBE</div>
+
+    <div class="search-bar">
+      <input type="text" placeholder="Search users, posts..." />
+    </div>
+
+    <div class="header-actions">
+      <button class="icon-btn">🏠</button>
+      <button class="icon-btn" onclick="location.href='reels.html'">🎬</button>
+      <button class="icon-btn" onclick="location.href='explore.html'">🎮</button>
+      <button class="icon-btn" onclick="location.href='notifications.html'">🔔</button>
+      <button class="post-btn" onclick="openPostModal()">POST</button>
+    </div>
+  </div>
+</header>
+
+<!-- ================= MAIN ================= -->
+<div class="container">
+
+  <!-- ===== LEFT SIDEBAR ===== -->
+  <aside class="sidebar">
+    <div class="nav-menu">
+      <div class="nav-item active">🏠 Home</div>
+      <div class="nav-item" onclick="location.href='explore.html'">🔍 Explore</div>
+      <div class="nav-item" onclick="location.href='messages.html'">💬 Messages</div>
+      <div class="nav-item" onclick="location.href='profile.html'">👤 Profile</div>
+      <div class="nav-item" onclick="location.href='settings.html'">⚙️ Settings</div>
+    </div>
+  </aside>
+
+  <!-- ===== FEED ===== -->
+  <main class="feed">
+
+   <div class="story-carousel">
+  <input type="file" id="storyFileInput" style="display: none;" accept="image/*,video/*" onchange="handleDirectStoryUpload(event)">
+
+  <div class="story-item" onclick="document.getElementById('storyFileInput').click()">
+    <div class="story-ring add-story">
+      <div class="story-avatar">+</div>
+    </div>
+    <div class="story-username">Add Story</div>
+  </div>
+
+  <div id="dynamicStories" style="display: flex; gap: 15px;"></div>
+</div>
+    <!-- POSTS -->
+    <div id="postsContainer"></div>
+  </main>
+
+  <!-- ===== RIGHT SIDEBAR ===== -->
+  <aside class="right-sidebar">
+    <div class="profile-widget">
+      <div class="profile-header">
+        <div class="profile-avatar" id="userWidgetAvatar">?</div>
+        <div class="profile-name">
+          <h3 id="userWidgetFullname">Loading...</h3>
+          <span id="userWidgetUsername">@username</span>
+        </div>
+      </div>
+    </div>
+  </aside>
+
+</div>
+<div id="storyViewer" class="modal" onclick="closeStoryViewer(event)">
+    <div class="story-content-container" onclick="event.stopPropagation()">
+        <div class="story-progress-bar"><div id="storyProgress"></div></div>
+        <img id="storyViewMedia" src="" alt="Story">
+        <span id="storyViewUser"></span>
+    </div>
+</div>
+<!-- ================= CREATE POST MODAL ================= -->
+<div id="postModal" class="modal" onclick="closePostModal(event)">
+  <form id="postForm" class="post-form" onclick="event.stopPropagation()">
+
+    <input type="file" id="postImage" accept="image/*" required />
+    <textarea id="captionInput" placeholder="Write a caption..." required></textarea>
+
+    <button type="submit" class="btn-primary">Post</button>
+  </form>
+</div>
+
+<!-- ================= SCRIPTS ================= -->
+<script src="../scripts/core/vibe.js"></script>
+<script type="module" src="../scripts/features/post/createPost.js"></script>
+<script type="module" src="../scripts/core/auth.js"></script>
+
+
+<script type="module">
+import { API_BASE_URL } from "../scripts/core/config.js";
+
+/* ===============================
+   POST MODAL
+=============================== */
+function openPostModal() {
+  document.getElementById("postModal").classList.add("active");
+}
+
+function closePostModal(e) {
+  if (e.target.id === "postModal") {
+    document.getElementById("postModal").classList.remove("active");
+  }
+}
+
+/* ===============================
+   FETCH & RENDER POSTS
+=============================== */
+async function fetchAndRenderPosts() {
+  const container = document.getElementById("postsContainer");
+  const token = localStorage.getItem("token");
+
+  if (!token) {
+    window.location.href = "login.html";
+    return;
+  }
+
+  try {
+    const res = await fetch(`${API_BASE_URL}/post`, {
+      headers: {
+        Authorization: `Bearer ${token}`
+      }
+    });
+
+    if (!res.ok) throw new Error("Failed to fetch posts");
+
+    const posts = await res.json();
+    container.innerHTML = "";
+
+    if (!posts.length) {
+      container.innerHTML = "<p style='text-align:center;'>No posts yet.</p>";
+      return;
+    }
+
+    posts.forEach(post => {
+      const username = post.user?.username || "unknown";
+
+      const postHTML = `
+        <div class="post-card" onclick="openPost('${post._id}')">
+
+          <div class="post-header">
+            <div class="post-avatar">${username[0].toUpperCase()}</div>
+            <span class="post-username">@${username}</span>
+          </div>
+
+          ${post.image ? `<img src="${post.image}" class="post-media" />` : ""}
+
+          <div class="post-actions">
+  <button onclick="likePost('${post._id}', this)">
+    ❤️ <span>${post.likes?.length || 0}</span>
+  </button>
+
+  <button onclick="toggleComments('${post._id}')">
+    💬 ${post.comments?.length || 0}
+  </button>
+</div>
+
+<div class="comments" id="comments-${post._id}" style="display:none;">
+  <div class="comment-list"></div>
+
+  <input
+    type="text"
+    placeholder="Write a comment..."
+    onkeydown="submitComment(event, '${post._id}')"
+  />
+</div>
+
+          <div class="post-details">
+            <p><strong>@${username}</strong> ${post.caption || ""}</p>
+            <span class="post-time">
+              ${new Date(post.createdAt).toLocaleString()}
+            </span>
+          </div>
+
+        </div>
+      `;
+
+      container.insertAdjacentHTML("beforeend", postHTML);
+    });
+
+  } catch (err) {
+    console.error(err);
+    localStorage.removeItem("token");
+    window.location.href = "login.html";
+  }
+}
+
+window.openPostModal = openPostModal;
+window.closePostModal = closePostModal;
+window.fetchAndRenderPosts = fetchAndRenderPosts;
+document.addEventListener("DOMContentLoaded", fetchAndRenderPosts);
+
+</script>
+
+<script type="module">
+import { API_BASE_URL } from "../scripts/core/config.js";
+
+async function likePost(postId, btn) {
+  const token = localStorage.getItem("token");
+
+  const res = await fetch(
+    `${API_BASE_URL}/post/${postId}/like`,
+    {
+      method: "PUT",
+      headers: {
+        Authorization: `Bearer ${token}`
+      }
+    }
+  );
+
+  const data = await res.json();
+  btn.querySelector("span").textContent = data.likesCount;
+}
+
+function toggleComments(postId) {
+  const el = document.getElementById(`comments-${postId}`);
+  el.style.display = el.style.display === "none" ? "block" : "none";
+}
+
+async function submitComment(e, postId) {
+  if (e.key !== "Enter") return;
+
+  const input = e.target;
+  const text = input.value.trim();
+  if (!text) return;
+
+  const token = localStorage.getItem("token");
+
+  const res = await fetch(
+    `${API_BASE_URL}/post/${postId}/comment`,
+    {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${token}`
+      },
+      body: JSON.stringify({ text })
+    }
+  );
+
+  const comment = await res.json();
+
+  const list = document.querySelector(
+    `#comments-${postId} .comment-list`
+  );
+
+  list.insertAdjacentHTML(
+    "beforeend",
+    `<p><strong>@${comment.user.username}</strong> ${comment.text}</p>`
+  );
+
+  input.value = "";
+}
+window.likePost = likePost;
+window.toggleComments = toggleComments;
+window.submitComment = submitComment;
+</script>
+</body>
+</html>

@@ -1,0 +1,208 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>VIBE – Login</title>
+
+  <!-- Fonts -->
+  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;700;800&family=DM+Sans:wght@400;500;700&display=swap" rel="stylesheet">
+
+  <!-- Styles -->
+  <link rel="stylesheet" href="../styles/login.css">
+
+  <!-- Favicon -->
+  <link rel="icon" type="image/png" href="../assets/icons/favicon.png">
+</head>
+
+<body>
+
+<!-- ═══════════ LEFT – BRANDING ═══════════ -->
+<section class="brand-panel">
+  <div class="orb orb--1"></div>
+  <div class="orb orb--2"></div>
+  <div class="orb orb--3"></div>
+
+  <div class="brand-logo">VIBE</div>
+
+  <p class="brand-tag">
+    Connect, share, and <em>inspire</em>.<br>
+    Your world, beautifully curated.
+  </p>
+
+  <div class="pills">
+    <div class="pill"><span class="pill__dot"></span> Photos</div>
+    <div class="pill"><span class="pill__dot"></span> Stories</div>
+    <div class="pill"><span class="pill__dot"></span> Community</div>
+    <div class="pill"><span class="pill__dot"></span> Creativity</div>
+  </div>
+</section>
+
+<!-- ═══════════ RIGHT – FORM ═══════════ -->
+<section class="form-panel">
+
+  <!-- Tabs -->
+  <div class="tabs">
+    <button type="button" class="tab tab--active" data-tab="login">LOGIN</button>
+    <button type="button" class="tab" data-tab="signup">SIGN UP</button>
+  </div>
+
+  <!-- Panels -->
+  <div class="panels-wrap" id="panelsWrap">
+
+    <!-- ================= LOGIN ================= -->
+    <div class="panel panel--login">
+      <form id="loginForm" novalidate>
+
+        <div class="form-group">
+          <label>Email</label>
+          <div class="input-wrap">
+            <span class="icon">📧</span>
+            <input
+              type="email"
+              id="loginEmail"
+              name="email"
+              placeholder="you@example.com"
+              autocomplete="email"
+              required
+            >
+          </div>
+          <div class="error-msg" id="loginEmailErr"></div>
+        </div>
+
+        <div class="form-group">
+          <label>Password</label>
+          <div class="input-wrap">
+            <span class="icon">🔒</span>
+            <input
+              type="password"
+              id="loginPassword"
+              name="password"
+              placeholder="••••••••"
+              autocomplete="current-password"
+              required
+            >
+            <button
+              type="button"
+              class="toggle-pw"
+              data-target="loginPassword"
+              aria-label="Toggle password visibility"
+            >
+              👁
+            </button>
+          </div>
+          <div class="error-msg" id="loginPasswordErr"></div>
+        </div>
+
+        <div class="row-options">
+          <label class="checkbox-wrap">
+            <input type="checkbox" name="remember">
+            <span>Remember me</span>
+          </label>
+          <a href="#" class="forgot-link">Forgot password?</a>
+        </div>
+
+        <button type="submit" class="btn-primary">
+          <span class="btn-text">LOG IN</span>
+          <span class="spinner"></span>
+        </button>
+
+      </form>
+    </div>
+
+    <!-- ================= SIGNUP ================= -->
+    <div class="panel panel--signup">
+      <form id="signupForm" novalidate>
+
+        <div class="form-group">
+          <label>Full Name</label>
+          <input
+            type="text"
+            id="signupName"
+            name="fullName"
+            placeholder="Your name"
+            autocomplete="name"
+            required
+          >
+          <div class="error-msg" id="signupNameErr"></div>
+        </div>
+
+        <div class="form-group">
+          <label>Username</label>
+          <input
+            type="text"
+            id="signupUsername"
+            name="username"
+            placeholder="@username"
+            autocomplete="username"
+            required
+          >
+          <div class="error-msg" id="signupUsernameErr"></div>
+        </div>
+
+        <div class="form-group">
+          <label>Email</label>
+          <input
+            type="email"
+            id="signupEmail"
+            name="email"
+            placeholder="you@example.com"
+            autocomplete="email"
+            required
+          >
+          <div class="error-msg" id="signupEmailErr"></div>
+        </div>
+
+        <div class="form-group">
+          <label>Password</label>
+          <input
+            type="password"
+            id="signupPassword"
+            name="password"
+            placeholder="Create a strong password"
+            autocomplete="new-password"
+            required
+            oninput="checkStrength(this.value)"
+          >
+
+          <!-- Strength bar -->
+          <div class="strength-bar" id="strengthBar">
+            <span></span><span></span><span></span><span></span>
+          </div>
+          <div class="strength-label" id="strengthLabel"></div>
+
+          <div class="error-msg" id="signupPasswordErr"></div>
+        </div>
+
+        <div class="terms-row">
+          <input type="checkbox" id="termsCheck" required>
+          <span>I agree to the Terms & Privacy Policy</span>
+        </div>
+
+        <button type="submit" class="btn-primary">
+          <span class="btn-text">CREATE ACCOUNT</span>
+          <span class="spinner"></span>
+        </button>
+
+      </form>
+    </div>
+
+  </div>
+
+  <!-- Social -->
+  <div class="divider"><span>OR</span></div>
+
+  <div class="social-row">
+    <button class="btn-social">Google</button>
+    <button class="btn-social">Apple</button>
+    <button class="btn-social">GitHub</button>
+  </div>
+
+</section>
+
+<!-- ================= JS ================= -->
+<script type="module" src="../scripts/features/auth/login.js"></script>
+<script type="module" src="../scripts/features/auth/signup.js"></script>
+
+</body>
+</html>

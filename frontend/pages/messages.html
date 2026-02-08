@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>VIBE • Messages</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="stylesheet" href="../styles/messages.css">
+</head>
+<body>
+  <header class="header">
+    <div class="header-content">
+      <div class="logo" onclick="window.location.href='vibe.html'">VIBE</div>
+      <div class="header-actions">
+        <button class="icon-btn" onclick="window.location.href='vibe.html'">🏠</button>
+        <div class="profile-avatar-small" id="myAvatar">U</div>
+      </div>
+    </div>
+  </header>
+
+  <div class="messages-layout">
+    <aside class="chat-list">
+      <div class="list-search">
+        <input type="text" placeholder="Search messages..." id="userSearch">
+      </div>
+      <div id="chatList" class="chat-list">
+        </div>
+    </aside>
+
+    <section class="chat-view" id="chatView">
+      <div id="noChatSelected" class="empty-state">
+        <div class="empty-icon">💬</div>
+        <p>Select a vibe to start chatting</p>
+      </div>
+
+      <div id="activeChat" class="active-chat-container hidden">
+        <div class="chat-header">
+          <button class="back-btn mobile-only" onclick="goBack()">←</button>
+          <div class="post-avatar" id="chatAvatar"></div>
+          <div class="chat-user-meta">
+            <strong id="chatUsername">Username</strong>
+            <span class="status-indicator online">Active now</span>
+          </div>
+        </div>
+
+        <div class="chat-messages" id="chatMessages">
+          </div>
+
+        <form class="chat-input-area" id="messageForm">
+          <button type="button" class="attach-btn">+</button>
+          <input type="text" id="chatInput" placeholder="Message..." autocomplete="off">
+          <button type="submit" class="send-btn">Send</button>
+        </form>
+      </div>
+    </section>
+  </div>
+
+  <nav class="mobile-nav">
+    <button onclick="location.href='vibe.html'">🏠</button>
+    <button onclick="location.href='messages.html'" class="active">💬</button>
+    <button onclick="location.href='profile.html'">👤</button>
+    <button onclick="location.href='settings.html'">⚙️</button>
+  </nav>
+
+  <script src="../scripts/features/messages/messages.js"></script>
+</body>
+</html>

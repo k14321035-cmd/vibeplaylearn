@@ -1,0 +1,378 @@
+/* Make the container take the whole screen and snap */
+.reels-container {
+  height: 100vh;
+  overflow-y: scroll;
+  scroll-snap-type: y mandatory; /* This makes it feel like TikTok/Reels */
+  scrollbar-width: none; /* Hide scrollbar for Firefox */
+}
+
+.reels-container::-webkit-scrollbar {
+  display: none; /* Hide scrollbar for Chrome/Safari */
+}
+
+/* Each reel occupies exactly one screen height */
+.reel-slide {
+  height: 100vh;
+  width: 100%;
+  scroll-snap-align: start;
+  position: relative;
+  background: #000;
+}
+
+.reel-video {
+  width: 100%;
+  height: 100%;
+  object-fit: cover; /* Important: prevents black bars on video */
+}
+
+/* Footer area for the Upload Button */
+.reels-footer {
+  position: fixed;
+  bottom: 80px; /* Sits above the mobile-nav */
+  width: 100%;
+  display: flex;
+  justify-content: center;
+  z-index: 10;
+  pointer-events: none; /* Allows clicking video behind it, except for the button */
+}
+
+.add-reel-btn {
+  pointer-events: auto;
+  background: rgba(96, 52, 52, 0.2);
+  backdrop-filter: blur(10px);
+  border: 1px solid rgba(102, 47, 47, 0.3);
+  padding: 10px 20px;
+  border-radius: 30px;
+  color: rgb(195, 128, 128);
+  font-weight: bold;
+  cursor: pointer;
+  box-shadow: 0 4px 15px rgba(0,0,0,0.3);
+}
+
+/* Modal Styling */
+.upload-modal {
+  display: none;
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.9);
+  z-index: 1000;
+  align-items: center;
+  justify-content: center;
+}
+
+.upload-modal.active {
+  display: flex;
+}
+
+/* --- Overlay / Backdrop --- */
+.upload-modal {
+    display: none; /* Hidden by default */
+    position: fixed;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.85);
+    backdrop-filter: blur(8px);
+    z-index: 2000; /* Ensure it's above everything */
+    align-items: center;
+    justify-content: center;
+    padding: 20px;
+}
+
+/* Show modal when 'active' class is added via JS */
+.upload-modal.active {
+    display: flex;
+}
+
+/* --- Modal Card --- */
+.modal-content {
+    background: #1a1a1a;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    width: 100%;
+    max-width: 400px;
+    border-radius: 20px;
+    padding: 24px;
+    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.4);
+}
+
+/* --- Header --- */
+.modal-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+}
+
+.modal-header h3 {
+    color: #fff;
+    font-size: 1.2rem;
+    font-weight: 600;
+}
+
+.modal-header button {
+    background: none;
+    border: none;
+    color: #888;
+    font-size: 1.5rem;
+    cursor: pointer;
+    transition: color 0.2s;
+}
+
+.modal-header button:hover {
+    color: #fff;
+}
+
+/* --- Form Elements --- */
+#reelForm {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+}
+
+/* Styling the File Input */
+#reelVideo {
+    background: rgba(61, 46, 128, 0.05);
+    border: 2px dashed rgba(255, 255, 255, 0.2);
+    padding: 10px;
+    border-radius: 12px;
+    color: #ccc;
+    cursor: pointer;
+    width: 90%;
+}
+
+#reelVideo:hover {
+    border-color: #27b8c8;
+    background: rgba(80, 8, 196, 0.05);
+}
+
+/* Styling the Caption Textarea */
+#reelCaption {
+    background: #262626;
+    border: 1px solid #363636;
+    border-radius: 12px;
+    padding: 12px;
+    color: #fff;
+    resize: none;
+    min-height: 100px;
+    outline: none;
+    font-size: 0.95rem;
+}
+
+#reelCaption:focus {
+    border-color: #555;
+}
+
+/* Container for everything that sits on top of the video */
+.reel-overlay {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    height: 40%; /* Only covers the bottom portion */
+    background: linear-gradient(transparent, rgba(0, 0, 0, 0.7));
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-end;
+    padding: 20px 80px 30px 15px; /* Extra padding on right for buttons */
+    z-index: 5;
+    pointer-events: none; /* Allows clicks to pass through to the video */
+}
+
+.reel-content {
+    color: white;
+    max-width: 85%;
+}
+
+.reel-username {
+    font-size: 17px;
+    font-weight: 700;
+    margin-bottom: 8px;
+    cursor: pointer;
+    pointer-events: auto;
+}
+
+.reel-description {
+    font-size: 14px;
+    line-height: 1.3;
+    margin-bottom: 12px;
+    display: -webkit-box;
+    -webkit-line-clamp: 2; /* Limits to 2 lines like TikTok */
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+}
+
+/* Music scrolling effect */
+.reel-music {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 13px;
+    width: fit-content;
+}
+
+.music-name {
+    white-space: nowrap;
+    overflow: hidden;
+    animation: scrollMusic 8s linear infinite;
+}
+
+@keyframes scrollMusic {
+    0% { transform: translateX(0); }
+    100% { transform: translateX(-20%); }
+}
+
+/* Sidebar buttons */
+.reel-actions {
+    position: absolute;
+    right: 12px;
+    bottom: 120px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 20px;
+    z-index: 20;
+}
+
+.action-item {
+    background: none;
+    border: none;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    color: white;
+    cursor: pointer;
+    transition: transform 0.1s ease;
+    text-shadow: 0 2px 4px rgba(0, 0, 0, 0.5); /* Makes white icons visible on light videos */
+}
+.action-item {
+    font-size: 28px; /* Standard IG icon size */
+}
+.action-item span {
+    font-size: 12px;
+    font-weight: 600;
+    margin-top: 4px;
+    text-shadow: 0 1px 2px rgba(0, 0, 0, 0.8);
+}
+/* Interactive Feedback */
+.action-item:active {
+    transform: scale(0.85);
+}
+
+.action-item:hover {
+    opacity: 0.8;
+}
+/* --- Submit Button --- */
+.submit-btn {
+    background: #0095f6; /* Vibe Blue */
+    color: white;
+    border: none;
+    padding: 14px;
+    border-radius: 12px;
+    font-weight: 700;
+    font-size: 1rem;
+    cursor: pointer;
+    transition: background 0.2s, transform 0.1s;
+}
+
+.submit-btn:hover {
+    background: #1877f2;
+}
+
+.submit-btn:active {
+    transform: scale(0.98);
+}
+
+.submit-btn:disabled {
+    background: #555;
+    cursor: not-allowed;
+    opacity: 0.6;
+}
+/* Each reel container */
+.reel {
+    position: relative;
+    width: 100%;
+    height: 100vh; /* Full viewport height */
+    scroll-snap-align: start; /* Critical for the snappy scroll effect */
+    background: #000;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-end; /* Keeps caption at the bottom */
+}
+
+/* The Video Background */
+.reel video {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover; /* Ensures video fills screen without stretching */
+    z-index: 1;
+}
+
+/* Action Sidebar (Likes, Comments, Share) */
+
+.reel-actions button {
+    background: rgba(0, 0, 0, 0.3);
+    backdrop-filter: blur(5px);
+    border: none;
+    color: white;
+    font-size: 24px;
+    width: 50px;
+    height: 50px;
+    border-radius: 50%;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: transform 0.2s, background 0.2s;
+}
+
+.reel-actions button:hover {
+    background: rgba(255, 255, 255, 0.2);
+    transform: scale(1.1);
+}
+
+.reel-actions button:active {
+    transform: scale(0.9);
+}
+
+/* Caption and Username Overlay */
+.reel-caption {
+    position: relative;
+    z-index: 10;
+    padding: 20px;
+    padding-bottom: 40px; /* Space for the upload button/nav */
+    background: linear-gradient(transparent, rgba(0, 0, 0, 0.8));
+    color: white;
+    font-size: 15px;
+    line-height: 1.4;
+    width: 100%;
+}
+
+/* Mute/Unmute Indicator (Centered) */
+.mute-indicator {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    background: rgba(0, 0, 0, 0.5);
+    color: white;
+    padding: 15px;
+    border-radius: 50%;
+    z-index: 15;
+    opacity: 0; /* Hidden by default */
+    pointer-events: none;
+    transition: opacity 0.3s;
+}
+
+/* Like Animation Class */
+.like-btn.liked {
+    color: #ff3040;
+    animation: heartBeat 0.3s ease-in-out;
+}
+
+@keyframes heartBeat {
+    0% { transform: scale(1); }
+    50% { transform: scale(1.3); }
+    100% { transform: scale(1); }
+}

@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>VIBE • Notifications</title>
+  <link rel="stylesheet" href="../styles/style1.css" />
+</head>
+<body>
+
+<div class="header">
+  <div class="header-content">
+    <div class="logo">VIBE</div>
+    <h3>Notifications</h3>
+    <button class="icon-btn" onclick="window.location.href='vibe.html'">🏠</button>
+  </div>
+</div>
+
+<div class="container" style="grid-template-columns: 1fr;">
+<main class="feed">
+  <div id="notificationsContainer">
+    <div class="loading-state" style="text-align: center; padding: 20px; color: #888;">
+       Fetching your vibes...
+    </div>
+  </div>
+</main>
+</div>
+<!-- Mobile Bottom Navigation -->
+<nav class="mobile-nav">
+  <button onclick="location.href='vibe.html'">🏠</button>
+  <button onclick="location.href='messages.html'">💬</button>
+  <button onclick="location.href='profile.html'">👤</button>
+  <button onclick="location.href='settings.html'">⚙️</button>
+</nav>
+
+<script>
+function openChatFromNotification(user) {
+  window.location.href = `messages.html?user=${user}`;
+}
+</script>
+<script>
+if (localStorage.getItem("theme") === "light") {
+  document.body.classList.add("light");
+}
+</script>
+<script>
+const prefersDark = window.matchMedia("(prefers-color-scheme: dark)");
+
+function applyTheme(theme) {
+  if (theme === "light") {
+    document.body.classList.add("light");
+  } else if (theme === "dark") {
+    document.body.classList.remove("light");
+  } else {
+    // system
+    document.body.classList.toggle("light", !prefersDark.matches);
+  }
+}
+
+// Load saved theme or default to system
+const savedTheme = localStorage.getItem("theme") || "system";
+applyTheme(savedTheme);
+
+// React to system theme changes
+prefersDark.addEventListener("change", () => {
+  if ((localStorage.getItem("theme") || "system") === "system") {
+    applyTheme("system");
+  }
+});
+</script>
+<script type="module">
+import { API_BASE_URL } from "../scripts/core/config.js";
+
+async function loadNotifications() {
+  const container = document.getElementById("notificationsContainer");
+  const token = localStorage.getItem("token");
+
+  if (!token) {
+    window.location.href = 'login.html';
+    return;
+  }
+
+  try {
+    // Replace with your actual notification endpoint
+    const res = await fetch(`${API_BASE_URL}/notifications`, {
+      headers: { "Authorization": `Bearer ${token}` }
+    });
+
+    if (!res.ok) throw new Error("Could not load notifications");
+
+    const notifications = await res.json();
+    container.innerHTML = ""; // Clear the "loading" text
+
+    if (notifications.length === 0) {
+      container.innerHTML = "<p style='text-align:center; padding:20px;'>No notifications yet.</p>";
+      return;
+    }
+
+    notifications.forEach(notif => {
+      const avatarChar = notif.fromUser?.username ? notif.fromUser.username[0].toUpperCase() : "?";
+      
+      const html = `
+        <div class="post-card" onclick="${notif.type === 'message' ? `openChat('${notif.fromUser.username}')` : ''}">
+          <div class="post-header">
+            <div class="post-user">
+              <div class="post-avatar">${avatarChar}</div>
+              <div class="post-info">
+                <h4>${notif.fromUser.username}</h4>
+                <span>${getNotificationText(notif)}</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      `;
+      container.insertAdjacentHTML("beforeend", html);
+    });
+
+  } catch (err) {
+    console.error(err);
+    container.innerHTML = "<p style='text-align:center; color:red;'>Error connecting to server.</p>";
+  }
+}
+
+function getNotificationText(notif) {
+  switch(notif.type) {
+    case 'like': return 'liked your post ❤️';
+    case 'follow': return 'started following you';
+    case 'comment': return 'commented on your post 💬';
+    case 'message': return 'sent you a message ✉️';
+    default: return 'interacted with you';
+  }
+}
+
+function openChat(username) {
+  window.location.href = `messages.html?user=${username}`;
+}
+
+// Initialize on page load
+window.openChat = openChat;
+document.addEventListener("DOMContentLoaded", loadNotifications);
+</script>
+
+</body>
+</html>

@@ -1,0 +1,123 @@
+/* =========================
+   EXPLORE PAGE (BASE)
+   ========================= */
+
+.explore-container {
+  padding: 80px 16px 90px; /* header + mobile nav */
+  min-height: 100vh;
+  background: var(--bg-primary);
+  color: var(--text-primary);
+}
+
+/* =========================
+   EXPLORE HUB (GAME SELECTOR)
+   ========================= */
+
+.explore-title {
+  font-size: 20px;
+  margin-bottom: 16px;
+}
+
+.games-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+  gap: 14px;
+}
+
+.game-card {
+  background: var(--bg-card);
+  border-radius: 16px;
+  padding: 16px;
+  text-align: center;
+  cursor: pointer;
+  transition: transform 0.2s, background 0.2s;
+}
+
+.game-card:hover {
+  background: rgba(0,255,136,0.12);
+  transform: translateY(-2px);
+}
+
+.game-icon {
+  font-size: 36px;
+  margin-bottom: 8px;
+}
+
+.game-name {
+  font-size: 14px;
+  font-weight: 600;
+}
+
+.game-desc {
+  font-size: 12px;
+  color: var(--text-secondary);
+  margin-top: 4px;
+}
+
+/* =========================
+   TIC TAC TOE GAME
+   ========================= */
+
+.explore-game {
+  width: 100%;
+  max-width: 320px;
+  margin: 0 auto;
+  text-align: center;
+}
+
+.ttt-board {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 8px;
+  margin: 20px 0;
+}
+
+.cell {
+  aspect-ratio: 1;
+  background: var(--bg-card);
+  border-radius: 14px;
+  font-size: 48px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  user-select: none;
+  transition: background 0.2s;
+}
+
+.cell:hover {
+  background: rgba(0,255,136,0.15);
+}
+
+.ttt-status {
+  margin: 10px 0;
+  font-size: 16px;
+}
+
+.ttt-reset {
+  background: var(--accent-1);
+  color: #000;
+  border: none;
+  padding: 10px 18px;
+  border-radius: 20px;
+  font-size: 14px;
+  cursor: pointer;
+}
+
+/* =========================
+   MOBILE ADJUSTMENTS
+   ========================= */
+
+@media (max-width: 768px) {
+
+  .games-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  .cell {
+    font-size: 56px;
+  }
+}
+/* =========================
+   LOBBY
+   ========================= */

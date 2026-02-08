@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>VIBE • Reels</title>
+  <link rel="stylesheet" href="../styles/reels.css">
+</head>
+<body>
+
+  <main class="reels-container" id="reelsContainer">
+
+    </main>
+   <div class="reels-footer">
+    <button class="add-reel-btn" onclick="openUploadModal()">
+      <span class="plus-icon">+</span> Create Reel
+    </button>
+  </div>
+
+  <div class="upload-modal" id="uploadModal">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h3>Share Reel</h3>
+        <button onclick="closeUploadModal()">✕</button>
+      </div>
+      <form id="reelForm">
+        <input type="file" id="reelVideo" accept="video/*" required />
+        <textarea id="reelCaption" placeholder="Write a caption..."></textarea>
+        <button type="submit" class="submit-btn">Post Now</button>
+      </form>
+    </div>
+  </div>
+
+  <nav class="mobile-nav">
+    <button onclick="location.href='vibe.html'">🏠</button>
+    <button onclick="location.href='explore.html'">🔍</button>
+    <button onclick="location.href='reels.html'" class="active">🎬</button>
+    <button onclick="location.href='profile.html'">👤</button>
+  </nav>
+
+
+  <script type="module" src="../scripts/features/reels/createReels.js"></script>
+   <script type="module" src="../scripts/features/reels/feed.js"></script>
+
+  <script>
+    function openUploadModal() {
+      document.getElementById('uploadModal').classList.add('active');
+    }
+    function closeUploadModal() {
+      document.getElementById('uploadModal').classList.remove('active');
+    }
+  </script>
+</body>
+</html>

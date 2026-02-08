@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>VIBE • Settings</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <link rel="stylesheet" href="../styles/style1.css" />
+
+<script src="../scripts/core/settings.js"></script>
+</head>
+<body>
+
+<!-- Header -->
+<div class="header">
+  <div class="header-content">
+    <div class="logo">VIBE</div>
+    <div class="header-actions">
+      <button class="icon-btn" onclick="window.location.href='vibe.html'">🏠</button>
+    </div>
+  </div>
+</div>
+
+<div class="container">
+
+  <!-- Sidebar -->
+  <aside class="sidebar">
+    <div class="nav-menu">
+      <div class="nav-item" onclick="location.href='vibe.html'">🏠 Home</div>
+      <div class="nav-item" onclick="location.href='messages.html'">💬 Messages</div>
+      <div class="nav-item" onclick="location.href='notifications.html'">🔔 Notifications</div>
+      <div class="nav-item" onclick="location.href='profile.html'">👤 Profile</div>
+<div class="nav-item" onclick="location.href='settings.html'">⚙️ Settings</div>
+    </div>
+  </aside>
+
+  <!-- Settings Content -->
+ <main class="feed">
+
+  <!-- ACCOUNT -->
+  <div class="post-card">
+    <div class="post-caption"><strong>Account</strong></div>
+    <div class="post-comments">
+<div class="setting-row">
+  <span>Username</span>
+  <input type="text" id="set-username" placeholder="yourhandle">
+</div>
+<div class="setting-row">
+  <span>Email</span>
+  <input type="email" id="set-email" placeholder="you@email.com">
+</div>
+    </div>
+    <div class="post-card">
+  <button class="submit-btn" id="logoutBtn" style="background: #ff3b30;">Log Out</button>
+</div>
+  </div>
+
+  <!-- PRIVACY -->
+  <div class="post-card">
+    <div class="post-caption"><strong>Privacy</strong></div>
+    <div class="post-comments">
+      <div class="setting-row">
+        <span>Private Account</span>
+        <label class="switch">
+          <input type="checkbox">
+          <span class="slider"></span>
+        </label>
+      </div>
+
+      <div class="setting-row">
+        <span>Show Online Status</span>
+        <label class="switch">
+          <input type="checkbox" checked>
+          <span class="slider"></span>
+        </label>
+      </div>
+    </div>
+  </div>
+
+  <!-- NOTIFICATIONS -->
+  <div class="post-card">
+    <div class="post-caption"><strong>Notifications</strong></div>
+    <div class="post-comments">
+      <div class="setting-row">
+        <span>Message Notifications</span>
+        <label class="switch">
+          <input type="checkbox" checked>
+          <span class="slider"></span>
+        </label>
+      </div>
+
+      <div class="setting-row">
+        <span>Likes & Comments</span>
+        <label class="switch">
+          <input type="checkbox">
+          <span class="slider"></span>
+        </label>
+      </div>
+    </div>
+  </div>
+
+  <!-- APPEARANCE -->
+  <div class="post-card">
+    <div class="post-caption"><strong>Appearance</strong></div>
+    <div class="post-comments">
+   <div class="setting-row">
+  <span>Theme</span>
+  <select id="themeSelect">
+    <option value="system">System</option>
+    <option value="dark">Dark</option>
+    <option value="light">Light</option>
+  </select>
+</div>
+
+    </div>
+  </div>
+
+  <!-- LOGOUT -->
+ 
+
+</main>
+
+
+</div>
+<!-- Mobile Bottom Navigation -->
+<nav class="mobile-nav">
+  <button onclick="location.href='vibe.html'">🏠</button>
+  <button onclick="location.href='messages.html'">💬</button>
+  <button onclick="location.href='profile.html'">👤</button>
+  <button onclick="location.href='settings.html'">⚙️</button>
+</nav>
+
+</body>
+</html>

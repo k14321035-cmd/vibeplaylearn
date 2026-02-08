@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>VIBE • Profile</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <link rel="stylesheet" href="../styles/style1.css" />
+</head>
+<body>
+
+<!-- Header -->
+<div class="header">
+  <div class="header-content">
+    <div class="logo">VIBE</div>
+    <div class="header-actions">
+      <button class="icon-btn" onclick="window.location.href='vibe.html'">🏠</button>
+    </div>
+  </div>
+</div>
+
+<div class="container">
+
+  <!-- Sidebar -->
+  <aside class="sidebar">
+    <div class="nav-menu">
+      <div class="nav-item" onclick="location.href='vibe.html'">🏠 Home</div>
+      <div class="nav-item" onclick="location.href='messages.html'">💬 Messages</div>
+      <div class="nav-item" onclick="location.href='notifications.html'">🔔 Notifications</div>
+      <div class="nav-item active">👤 Profile</div>
+      <div class="nav-item" onclick="location.href='settings.html'">⚙️ Settings</div>
+    </div>
+  </aside>
+
+  <!-- Profile Content -->
+ <main class="feed">
+
+  <!-- PROFILE CARD -->
+  <div class="profile-widget">
+
+    <div class="profile-header">
+      <div class="profile-avatar" id="profileAvatar">Y</div>
+      <div class="profile-name">
+        <h3 id="displayName">Your Name</h3>
+        <span id="displayUsername">@yourhandle</span>
+      </div>
+    </div>
+
+    <button class="follow-btn" onclick="openEditProfile()">Edit Profile</button>
+
+  </div>
+
+  <!-- BIO -->
+  <div class="post-card">
+    <div class="post-caption">
+      <strong>Bio</strong>
+      <p id="displayBio">Building cool stuff 🚀</p>
+    </div>
+  </div>
+
+</main>
+
+<!-- EDIT PROFILE MODAL -->
+<div class="modal" id="editProfileModal">
+  <div class="modal-content">
+    <div class="modal-header">
+      <h2>Edit Profile</h2>
+      <button class="close-btn" onclick="closeEditProfile()">✕</button>
+    </div>
+
+    <div class="upload-area" onclick="document.getElementById('avatarInput').click()">
+      <div class="upload-text">Click to change avatar</div>
+      <img id="avatarPreview" class="preview-image">
+    </div>
+    <input type="file" id="avatarInput" accept="image/*" hidden>
+
+    <input id="nameInput" placeholder="Name">
+    <input id="usernameInput" placeholder="Username">
+    <textarea id="bioInput" placeholder="Bio"></textarea>
+
+    <button class="submit-btn" onclick="saveProfile()">Save Changes</button>
+  </div>
+</div>
+
+
+</div>
+<!-- Mobile Bottom Navigation -->
+<nav class="mobile-nav">
+  <button onclick="location.href='vibe.html'">🏠</button>
+  <button onclick="location.href='messages.html'">💬</button>
+  <button onclick="location.href='profile.html'">👤</button>
+  <button onclick="location.href='settings.html'">⚙️</button>
+</nav>
+
+<script src="../scripts/core/profile.js"></script>
+</body>
+</html>
