@@ -82,12 +82,13 @@ body {
 }
 
 #board {
-  width: 100% !important;
-  max-width: 500px;
+  width: 80vmin !important;
+  height: 80vmin !important;
+  max-width: 800px;
+  max-height: 800px;
   margin: 0 auto;
-  border-radius: 12px;
-  overflow: hidden;
-  box-shadow: 0 8px 32px rgba(0, 255, 136, 0.15);
+  border-radius: 4px; /* Reduced radius for cleaner board edges */
+  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.5);
 }
 
 #error-message {
