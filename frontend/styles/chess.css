@@ -146,15 +146,66 @@ body {
 
 /* Responsive */
 @media (max-width: 600px) {
-  .chess-container {
-    padding: 20px;
+  body {
+    padding: 0;
+    justify-content: flex-start; /* Align to top on mobile */
+    padding-top: 20px;
   }
 
-  #status {
-    font-size: 16px;
+  .chess-container {
+    padding: 0;
+    border: none;
+    box-shadow: none;
   }
 
   #board {
-    max-width: 100%;
+    width: 100vw !important;
+    height: 100vw !important;
+    max-width: 100% !important;
+    max-height: 100% !important;
+    border-radius: 0;
+    box-shadow: none;
   }
+
+  .game-info {
+    margin-top: 15px;
+    padding: 10px;
+    width: 100%;
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: space-between;
+    background: var(--bg-card);
+    border-top: 1px solid var(--border);
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    z-index: 10;
+  }
+
+  #status, #status-msg {
+    font-size: 14px;
+    margin-bottom: 0;
+    text-align: left;
+    flex-grow: 1;
+  }
+
+  .btn {
+    padding: 8px 16px;
+    font-size: 14px;
+    margin-left: 10px;
+  }
+}
+
+/* PC Specific tweaks to ensure "normal" size */
+@media (min-width: 601px) {
+    #board {
+        /* Revert to vmin or fixed size */
+        width: 70vmin !important;
+        height: 70vmin !important;
+    }
+    
+    .game-info {
+        margin-top: 20px;
+    }
 }
