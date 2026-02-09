@@ -2,12 +2,13 @@ import mongoose from "mongoose";
 import dotenv from "dotenv";
 import { fileURLToPath } from "url";
 import path from "path";
-import Post from "../models/Post.js";
+// Ensure this path matches your Reel model location
+import Reel from "../models/Reel.js"; 
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
-// Load .env from backend root (../../.env from src/scripts)
+// Load .env from backend root
 dotenv.config({ path: path.join(__dirname, "../../.env") });
 
 const connectDB = async () => {
@@ -24,22 +25,18 @@ const connectDB = async () => {
 };
 
 import fs from "fs";
-import Comment from "../models/comment.model.js";
 
-const deleteData = async () => {
+const deleteReelsData = async () => {
     await connectDB();
     try {
-        const posts = await Post.find({});
-        console.log(`Found ${posts.length} posts to delete.`);
+        const reels = await Reel.find({});
+        console.log(`Found ${reels.length} reels to delete.`);
 
-        for (const post of posts) {
-            // 1. Delete associated comments
-            await Comment.deleteMany({ post: post._id });
-
-            // 2. Delete associated image file
-            if (post.image) {
-                // post.image is likely stored as "/uploads/filename.ext"
-                const filename = path.basename(post.image);
+        for (const reel of reels) {
+            // 1. Delete associated video file
+            if (reel.video) {
+                // reel.video is likely stored as "/uploads/filename.ext"
+                const filename = path.basename(reel.video);
                 const filePath = path.join(__dirname, "../../uploads", filename);
                 
                 if (fs.existsSync(filePath)) {
@@ -48,17 +45,17 @@ const deleteData = async () => {
                 }
             }
 
-            // 3. Delete the post itself
-            await post.deleteOne();
+            // 2. Delete the reel (comments are embedded, so they go with it)
+            await reel.deleteOne();
         }
 
-        console.log(`✅ All posts and associated data deleted successfully.`);
+        console.log(`✅ All reels and associated files deleted successfully.`);
     } catch (err) {
-        console.error("❌ Error deleting posts:", err);
+        console.error("❌ Error deleting reels:", err);
     } finally {
         mongoose.connection.close();
         process.exit();
     }
 };
 
-deleteData();
+deleteReelsData();
