@@ -37,6 +37,13 @@
     .post-card:hover {
       background: rgba(255,255,255,0.03);
     }
+    
+    button.liked {
+      color: #ff0066; /* accent-2 */
+    }
+    button.liked span {
+      color: #ffffff;
+    }
   </style>
 </head>
 
@@ -157,9 +164,12 @@ function closePostModal(e) {
 /* ===============================
    FETCH & RENDER POSTS
 =============================== */
+import { getCurrentUser } from "../scripts/core/auth.js";
+
 async function fetchAndRenderPosts() {
   const container = document.getElementById("postsContainer");
   const token = localStorage.getItem("token");
+  const currentUser = getCurrentUser();
 
   if (!token) {
     window.location.href = "login.html";
@@ -185,6 +195,7 @@ async function fetchAndRenderPosts() {
 
     posts.forEach(post => {
       const username = post.user?.username || "unknown";
+      const isLiked = currentUser && post.likes && post.likes.includes(currentUser._id);
 
       const postHTML = `
         <div class="post-card" onclick="openPost('${post._id}')">
@@ -197,16 +208,16 @@ async function fetchAndRenderPosts() {
           ${post.image ? `<img src="${BACKEND_URL}${post.image}" class="post-media" />` : ""}
 
           <div class="post-actions">
-  <button onclick="likePost('${post._id}', this)">
+  <button class="${isLiked ? 'liked' : ''}" onclick="likePost('${post._id}', this); event.stopPropagation();">
     ❤️ <span>${post.likes?.length || 0}</span>
   </button>
 
-  <button onclick="toggleComments('${post._id}')">
-    💬 ${post.comments?.length || 0}
+  <button onclick="toggleComments('${post._id}'); event.stopPropagation();">
+    💬 <span id="comment-count-${post._id}">${post.commentsCount || 0}</span>
   </button>
 </div>
 
-<div class="comments" id="comments-${post._id}" style="display:none;">
+<div class="comments" id="comments-${post._id}" style="display:none;" onclick="event.stopPropagation()">
   <div class="comment-list"></div>
 
   <input
@@ -231,8 +242,8 @@ async function fetchAndRenderPosts() {
 
   } catch (err) {
     console.error(err);
-    localStorage.removeItem("token");
-    window.location.href = "login.html";
+    // localStorage.removeItem("token");
+    // window.location.href = "login.html";
   }
 }
 
@@ -249,23 +260,73 @@ import { API_BASE_URL } from "../scripts/core/config.js";
 async function likePost(postId, btn) {
   const token = localStorage.getItem("token");
 
-  const res = await fetch(
-    `${API_BASE_URL}/post/${postId}/like`,
-    {
+  try {
+    const res = await fetch(`${API_BASE_URL}/post/${postId}/like`, {
       method: "PUT",
       headers: {
         Authorization: `Bearer ${token}`
       }
-    }
-  );
+    });
 
-  const data = await res.json();
-  btn.querySelector("span").textContent = data.likesCount;
+    if (!res.ok) {
+       console.error("Failed to like post");
+       return;
+    }
+
+    const likes = await res.json();
+    
+    // Update count
+    const countSpan = btn.querySelector("span");
+    if (countSpan) countSpan.textContent = likes.length;
+    
+    // Optional: Visual feedback (e.g., toggle heart color)
+    // This assumes specific CSS class logic not fully visible yet, 
+    // but at least updating the count is critical.
+    btn.classList.toggle("liked"); 
+    
+  } catch (err) {
+    console.error("Error liking post:", err);
+  }
 }
 
-function toggleComments(postId) {
+async function toggleComments(postId) {
   const el = document.getElementById(`comments-${postId}`);
-  el.style.display = el.style.display === "none" ? "block" : "none";
+  const list = el.querySelector(".comment-list");
+  
+  if (el.style.display === "none") {
+    el.style.display = "block";
+    
+    // Load comments if empty (simple cache)
+    if (list.innerHTML.trim() === "") {
+       list.innerHTML = "<p>Loading...</p>";
+       try {
+         const token = localStorage.getItem("token");
+         const res = await fetch(`${API_BASE_URL}/post/${postId}/comments`, {
+            headers: { Authorization: `Bearer ${token}` }
+         });
+         
+         if (!res.ok) throw new Error("Failed to load comments");
+         
+         const comments = await res.json();
+         
+         if (comments.length === 0) {
+            list.innerHTML = "<p class='no-comments'>No comments yet.</p>";
+         } else {
+            list.innerHTML = comments.map(c => `
+              <div class="comment-item" style="margin-bottom: 5px;">
+                <strong>@${c.user?.username || 'user'}</strong> 
+                <span style="color: #ccc;">${c.text}</span>
+              </div>
+            `).join("");
+         }
+       } catch (err) {
+         console.error(err);
+         list.innerHTML = "<p>Error loading comments.</p>";
+       }
+    }
+  } else {
+    el.style.display = "none";
+  }
 }
 
 async function submitComment(e, postId) {
@@ -295,10 +356,24 @@ async function submitComment(e, postId) {
     `#comments-${postId} .comment-list`
   );
 
+  // Remove "No comments" message if it exists
+  const noCommentsMsg = list.querySelector(".no-comments");
+  if (noCommentsMsg) noCommentsMsg.remove();
+
   list.insertAdjacentHTML(
     "beforeend",
-    `<p><strong>@${comment.user.username}</strong> ${comment.text}</p>`
+    `<div class="comment-item" style="margin-bottom: 5px;">
+        <strong>@${comment.user.username}</strong> 
+        <span style="color: #ccc;">${comment.text}</span>
+     </div>`
   );
+
+  // Update comment count
+  const countSpan = document.getElementById(`comment-count-${postId}`);
+  if (countSpan) {
+    const currentCount = parseInt(countSpan.textContent) || 0;
+    countSpan.textContent = currentCount + 1;
+  }
 
   input.value = "";
 }
