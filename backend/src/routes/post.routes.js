@@ -1,5 +1,6 @@
 import express from "express";
 import Post from "../models/Post.js";
+import Comment from "../models/comment.model.js";
 import {auth} from "../middleware/auth.middleware.js";
 import upload from "../middleware/upload.js";
 import { adminOnly } from "../middleware/admin.middleware.js";
@@ -44,7 +45,81 @@ router.get("/", auth, async (req, res) => {
       .populate("user", "username fullName avatar")
       .sort({ createdAt: -1 });
 
-    res.json(posts);
+      res.json(posts);
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ message: "Server Error" });
+  }
+});
+
+router.put("/:id/like", auth, async (req, res) => {
+  try {
+    const post = await Post.findById(req.params.id);
+
+    if (!post) {
+      return res.status(404).json({ message: "Post not found" });
+    }
+
+    // Check if the post has already been liked
+    const isLiked = post.likes.some(
+      (likeId) => likeId.toString() === req.user._id.toString()
+    );
+
+    if (isLiked) {
+      // Unlike
+      post.likes = post.likes.filter(
+        (likeId) => likeId.toString() !== req.user._id.toString()
+      );
+    } else {
+      // Like
+      post.likes.push(req.user._id);
+    }
+
+    await post.save();
+    res.json(post.likes);
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ message: "Server Error" });
+  }
+});
+
+// POST /api/posts/:id/comment
+router.post("/:id/comment", auth, async (req, res) => {
+  try {
+    const { text } = req.body;
+    if (!text) return res.status(400).json({ message: "Comment text required" });
+
+    const post = await Post.findById(req.params.id);
+    if (!post) return res.status(404).json({ message: "Post not found" });
+
+    const comment = await Comment.create({
+      user: req.user._id,
+      post: req.params.id,
+      text
+    });
+
+    // Populate user details for immediate display
+    await comment.populate("user", "username avatar");
+
+    // Update post comments count
+    post.commentsCount = (post.commentsCount || 0) + 1;
+    await post.save();
+
+    res.status(201).json(comment);
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ message: "Server Error" });
+  }
+});
+
+// GET /api/posts/:id/comments
+router.get("/:id/comments", auth, async (req, res) => {
+  try {
+    const comments = await Comment.find({ post: req.params.id })
+      .populate("user", "username avatar")
+      .sort({ createdAt: 1 }); // Oldest first
+
+    res.json(comments);
   } catch (err) {
     console.error(err);
     res.status(500).json({ message: "Server Error" });
