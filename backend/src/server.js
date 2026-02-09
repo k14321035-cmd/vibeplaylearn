@@ -17,6 +17,9 @@ import storyRoutes from "./routes/story.routes.js";
 import Message from "./models/message.model.js";
 import notificationRoutes from "./routes/notification.routes.js";
 import { initTicTacToe } from "./games/tictactoe/ttt.socket.js";
+import { initChess } from "./games/chess/chess.socket.js";
+
+// ... (existing code)
 
 
 
@@ -84,6 +87,7 @@ io.on("connection", socket => {
 
   // GAMES (IMPORTANT)
   initTicTacToe(io, socket);
+  initChess(io, socket);
   
 
   socket.on("disconnect", () => {
