@@ -38,7 +38,7 @@ body {
   width: 100%;
 }
 
-#status {
+#status, #status-msg {
   font-family: 'JetBrains Mono', monospace;
   font-size: 20px;
   font-weight: 700;
@@ -48,6 +48,37 @@ body {
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;
+}
+
+.game-info {
+  text-align: center;
+  margin-bottom: 20px;
+}
+
+.btn {
+  padding: 10px 20px;
+  background: var(--accent-2);
+  border: none;
+  color: white;
+  border-radius: 8px;
+  cursor: pointer;
+  font-weight: bold;
+  font-family: 'DM Sans', sans-serif;
+  transition: transform 0.2s;
+}
+
+.btn:active {
+  transform: scale(0.95);
+}
+
+.btn:disabled {
+  background: #555;
+  cursor: not-allowed;
+}
+
+.btn-exit {
+  background: #333;
+  margin-left: 10px;
 }
 
 #board {
