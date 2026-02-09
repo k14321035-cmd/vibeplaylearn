@@ -1,50 +1,55 @@
 
-        :root {
-            --bg-primary: #0a0a0a;
-            --bg-secondary: #141414;
-            --bg-card: #1a1a1a;
-            --accent-1: #00ff88;
-            --accent-2: #ff0066;
-            --accent-3: #00ccff;
-            --text-primary: #ffffff;
-            --text-secondary: #a0a0a0;
-            --border: #2a2a2a;
-        }
+:root {
+    --bg-primary: #0a0a0a;
+    --bg-secondary: #141414;
+    --bg-card: #1a1a1a;
+    --accent-1: #00ff88;
+    --accent-2: #ff0066;
+    --accent-3: #00ccff;
+    --text-primary: #ffffff;
+    --text-secondary: #a0a0a0;
+    --border: #2a2a2a;
+    --header-height: 70px;
+}
 
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    -webkit-tap-highlight-color: transparent; /* Fixes blue flash on mobile tap */
+}
 
-        body {
-            font-family: 'DM Sans', sans-serif;
-            background: var(--bg-primary);
-            color: var(--text-primary);
-            overflow-x: hidden;
-        }
+body {
+    font-family: 'DM Sans', sans-serif;
+    background: var(--bg-primary);
+    color: var(--text-primary);
+    overflow-x: hidden; /* Prevents horizontal shaking */
+    line-height: 1.5;
+}
 
-        /* Header */
-        .header {
-            position: fixed;
-            top: 0;
-            left: 0;
-            right: 0;
-            background: rgba(10, 10, 10, 0.95);
-            backdrop-filter: blur(20px);
-            border-bottom: 2px solid var(--border);
-            z-index: 1000;
-            padding: 0 20px;
-        }
+/* --- Fixed Header Stability --- */
+.header {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    background: rgba(10, 10, 10, 0.95);
+    backdrop-filter: blur(15px);
+    -webkit-backdrop-filter: blur(15px);
+    border-bottom: 1px solid var(--border);
+    z-index: 1000;
+    height: var(--header-height);
+}
 
-        .header-content {
-            max-width: 1400px;
-            margin: 0 auto;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            height: 70px;
-        }
+.header-content {
+    max-width: 1400px;
+    margin: 0 auto;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    height: 100%;
+    padding: 0 20px;
+}
 
         .logo {
             font-family: 'JetBrains Mono', monospace;
@@ -138,13 +143,14 @@
 
         /* Main Layout */
         .container {
-            max-width: 1400px;
-            margin: 90px auto 0;
-            display: grid;
-            grid-template-columns: 280px 1fr 340px;
-            gap: 30px;
-            padding: 20px;
-        }
+    max-width: 1400px;
+    margin: var(--header-height) auto 0;
+    display: grid;
+    grid-template-columns: 280px 1fr 340px;
+    gap: 30px;
+    padding: 20px;
+    min-height: 100vh;
+}
 
         /* Sidebar */
         .sidebar {
@@ -182,19 +188,12 @@
         .nav-item.active {
             background: linear-gradient(135deg, rgba(0, 255, 136, 0.15), rgba(0, 204, 255, 0.15));
             border-color: var(--accent-1);
-        }
-
-        /* Feed */
+        }      /* Feed */
         .feed {
             max-width: 600px;
             margin: 0 auto;
         }
-
- 
-
-
         /* Post Card */
-
         @keyframes slideUp {
             from {
                 opacity: 0;
@@ -235,16 +234,12 @@
         }
 /* --- Post Card Container --- */
 .post-card {
-    background: rgba(255, 255, 255, 0.05); /* Subtle transparent white */
-    backdrop-filter: blur(10px);
-    border: 1px solid rgba(255, 255, 255, 0.1);
-    border-radius: 16px;
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    border-radius: 12px;
     margin-bottom: 24px;
     overflow: hidden;
     width: 100%;
-    max-width: 500px;
-    margin-left: auto;
-    margin-right: auto;
     transition: transform 0.2s ease;
 }
 
@@ -721,14 +716,62 @@
             box-shadow: 0 10px 30px rgba(0, 255, 136, 0.3);
         }
 
-        @media (max-width: 1200px) {
-            .container {
-                grid-template-columns: 1fr;
-            }
-            .sidebar, .right-sidebar {
-                display: none;
-            }
-        }
+@media (max-width: 1100px) {
+    .container {
+        grid-template-columns: 1fr; /* Drop sidebars */
+        max-width: 700px;
+        padding: 15px;
+    }
+    .sidebar, .right-sidebar {
+        display: none;
+    }
+}
+
+@media (max-width: 768px) {
+    :root {
+        --header-height: 60px;
+    }
+
+    .header {
+        backdrop-filter: none; /* Better performance on older phones */
+    }
+
+    .logo {
+        font-size: 22px;
+        animation: none; /* Stop the CPU-heavy glitching */
+    }
+
+    .container {
+        margin-top: var(--header-height);
+        padding: 10px 0; /* Full width feed on mobile */
+    }
+
+    .post-card {
+        border-radius: 0; /* Edge-to-edge feel */
+        border-left: none;
+        border-right: none;
+        margin-bottom: 10px;
+    }
+
+    .mobile-nav {
+        position: fixed;
+        bottom: 0;
+        left: 0;
+        right: 0;
+        height: 65px;
+        background: var(--bg-secondary);
+        border-top: 1px solid var(--border);
+        display: flex;
+        justify-content: space-around;
+        align-items: center;
+        z-index: 2000;
+        padding-bottom: env(safe-area-inset-bottom); /* Fix for iPhone Notch */
+    }
+
+    body {
+        padding-bottom: 80px; /* Space for mobile nav */
+    }
+}
 
         @media (max-width: 768px) {
             .search-bar {
@@ -872,7 +915,7 @@
   border-radius: 16px;
   display: flex;
   flex-direction: column;
-  height: 75vh;
+height: calc(100dvh - var(--header-height) - 70px);
 }
 
 .hidden {
