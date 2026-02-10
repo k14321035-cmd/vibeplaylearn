@@ -24,8 +24,7 @@
 
 html,
 body {
-  height: 100%;
-  overflow: hidden;
+  min-height: 100%;
 }
 
 body {
@@ -181,7 +180,10 @@ body {
   background: var(--bg-card);
   border-left: 1px solid var(--border);
   position: relative;
-  overflow: hidden;
+  /* Allow scrolling if content exceeds height */
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
+  min-height: 100vh;
 }
 
 /* subtle top-right accent stripe */
@@ -723,10 +725,12 @@ input.error:focus {
   }
   .form-panel {
     width: 100%;
-    flex: 1;
+    flex: none;
     border-left: none;
     border-top: 1px solid var(--border);
     padding: 40px 28px 60px;
+    height: auto;
+    overflow: visible;
   }
 }
 
