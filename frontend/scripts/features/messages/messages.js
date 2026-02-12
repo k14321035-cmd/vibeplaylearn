@@ -51,13 +51,13 @@ function renderChatList(searchTerm = "") {
 
   chatList.innerHTML = filtered.map(chat => `
     <div class="chat-item ${chat.userId === currentChatUser ? 'active' : ''}" onclick="loadChat('${chat.userId}')">
-      <div class="chat-item-avatar">${chat.username[0].toUpperCase()}</div>
-      <div class="chat-item-info">
+      <div class="post-avatar">${chat.username[0].toUpperCase()}</div>
+      <div class="chat-item-content">
         <div class="chat-item-header">
-          <strong>${chat.username}</strong>
+          <strong class="chat-item-name">${chat.username}</strong>
           <span class="chat-item-time">${new Date(chat.lastAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</span>
         </div>
-        <div class="chat-item-last-msg">${chat.lastMessage}</div>
+        <div class="chat-item-preview">${chat.lastMessage}</div>
       </div>
       ${chat.unread > 0 ? `<div class="unread-badge">${chat.unread}</div>` : ''}
     </div>
@@ -118,11 +118,17 @@ export async function loadChat(userId) {
   chatMessages.innerHTML = "";
 
   messages.forEach(msg => {
+    const isMe = (msg.sender._id || msg.sender) === (user._id || user.id);
+    const time = new Date(msg.createdAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+
     const div = document.createElement("div");
-    // Check if sender is me (compare IDs)
-    const isMe = (msg.sender._id || msg.sender) === user.id;
-    div.className = isMe ? "msg me" : "msg";
-    div.textContent = msg.text;
+    div.className = `message ${isMe ? 'sent' : 'received'}`;
+    div.innerHTML = `
+      <div class="message-bubble">
+        <div class="message-text">${msg.text}</div>
+        <div class="message-time">${time}</div>
+      </div>
+    `;
     chatMessages.appendChild(div);
   });
 
@@ -132,8 +138,25 @@ export async function loadChat(userId) {
   // Auto-focus input for "click and type" experience
   const chatInput = document.getElementById("chatInput");
   if (chatInput) chatInput.focus();
+
+  // Mobile View Transition
+  const sidebar = document.querySelector(".sidebar");
+  const chatView = document.getElementById("chatView");
+  if (window.innerWidth <= 768) {
+    if (sidebar) sidebar.classList.add("hidden");
+    if (chatView) chatView.classList.add("show");
+  }
 }
 /* LOAD CHAT */
+
+/* GO BACK (Mobile) */
+export function goBack() {
+  const sidebar = document.querySelector(".sidebar");
+  const chatView = document.getElementById("chatView");
+  if (sidebar) sidebar.classList.remove("hidden");
+  if (chatView) chatView.classList.remove("show");
+}
+window.goBack = goBack;
 
 /* SEND MESSAGE */
 
@@ -151,10 +174,17 @@ socket.on("newMessage", message => {
 
 /* RENDER MESSAGE */
 function renderMessage(msg) {
-  const div = document.createElement("div");
   const isMe = (msg.sender._id || msg.sender) === (user._id || user.id);
-  div.className = `msg ${isMe ? "me" : "received"}`;
-  div.textContent = msg.text;
+  const time = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+
+  const div = document.createElement("div");
+  div.className = `message ${isMe ? 'sent' : 'received'}`;
+  div.innerHTML = `
+    <div class="message-bubble">
+      <div class="message-text">${msg.text}</div>
+      <div class="message-time">${time}</div>
+    </div>
+  `;
   chatMessages.appendChild(div);
   chatMessages.scrollTop = chatMessages.scrollHeight;
 }
