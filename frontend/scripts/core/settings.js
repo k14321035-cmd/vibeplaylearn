@@ -1,5 +1,7 @@
-import { getToken, logout } from "../scripts/core/auth.js";
+import { getToken, logout } from "./auth.js";
 import { API_BASE_URL } from "./config.js";
+
+console.log("Settings script loaded");
 
 // DOM Elements
 const themeSelect = document.getElementById("themeSelect");
@@ -57,14 +59,16 @@ async function loadUserSettings() {
 /* ===========================
    3. LOGOUT LOGIC
    =========================== */
-logoutBtn.addEventListener("click", () => {
-    if (confirm("Are you sure you want to log out?")) {
-        // Clear token from localStorage
-        localStorage.removeItem("token");
-        localStorage.removeItem("user");
-        window.location.href = "login.html"; 
-    }
-});
+if (logoutBtn) {
+    logoutBtn.addEventListener("click", () => {
+        console.log("Logout button clicked");
+        if (confirm("Are you sure you want to log out?")) {
+            logout();
+        }
+    });
+} else {
+    console.error("Logout button not found in DOM");
+}
 
 // Initialize
 loadUserSettings();
