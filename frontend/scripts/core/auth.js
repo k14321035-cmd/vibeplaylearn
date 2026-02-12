@@ -102,7 +102,7 @@ export function getCurrentUser() {
 
 export function logout() {
   localStorage.removeItem(TOKEN_KEY);
-  window.location.href = "/pages/login.html";
+  window.location.href = "login.html";
 }
 // Initialize when the page loads
 loadUserWidget();
