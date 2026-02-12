@@ -1,11 +1,13 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
   <meta charset="UTF-8">
   <title>VIBE • Messages</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <link rel="stylesheet" href="../styles/messages.css">
 </head>
+
 <body>
   <header class="header">
     <div class="header-content">
@@ -18,40 +20,81 @@
   </header>
 
   <div class="messages-layout">
-    <aside class="chat-list">
-      <div class="list-search">
-        <input type="text" placeholder="Search messages..." id="userSearch">
-      </div>
-      <div id="chatList" class="chat-list">
+    <aside class="sidebar">
+      <!-- Sidebar Header (User's Own Profile) -->
+      <header class="sidebar-header">
+        <div class="my-profile">
+          <div class="my-avatar" id="myAvatar">U</div>
         </div>
+        <div class="sidebar-actions">
+          <button class="icon-btn">💬</button>
+          <button class="icon-btn">⋮</button>
+        </div>
+      </header>
+
+      <!-- Search Area -->
+      <div class="search-container">
+        <div class="search-bar">
+          <span class="search-icon">🔍</span>
+          <input type="text" placeholder="Search or start new chat" id="userSearch">
+        </div>
+      </div>
+
+      <!-- Chat List -->
+      <div id="chatList" class="chat-list-scrollable">
+        <!-- Contacts will be injected here -->
+      </div>
     </aside>
 
-    <section class="chat-view" id="chatView">
+    <main class="chat-main" id="chatView">
+      <!-- Empty State -->
       <div id="noChatSelected" class="empty-state">
-        <div class="empty-icon">💬</div>
-        <p>Select a vibe to start chatting</p>
+        <div class="empty-content">
+          <div class="whatsapp-logo-placeholder">📱</div>
+          <h1>VIBE for Web</h1>
+          <p>Send and receive messages without keeping your phone online.<br>Use VIBE on up to 4 linked devices and 1
+            phone at the same time.</p>
+          <div class="encryption-note">🔒 End-to-end encrypted</div>
+        </div>
       </div>
 
+      <!-- Active Chat -->
       <div id="activeChat" class="active-chat-container hidden">
-        <div class="chat-header">
-          <button class="back-btn mobile-only" onclick="goBack()">←</button>
-          <div class="post-avatar" id="chatAvatar"></div>
-          <div class="chat-user-meta">
-            <strong id="chatUsername">Username</strong>
-            <span class="status-indicator online">Active now</span>
+        <header class="chat-header">
+          <div class="chat-header-info">
+            <button class="back-btn mobile-only" onclick="goBack()">←</button>
+            <div class="post-avatar" id="chatAvatar"></div>
+            <div class="chat-user-meta">
+              <strong id="chatUsername">Username</strong>
+              <span class="status-indicator">last seen recently</span>
+            </div>
           </div>
+          <div class="chat-header-actions">
+            <button class="icon-btn">🔍</button>
+            <button class="icon-btn">⋮</button>
+          </div>
+        </header>
+
+        <div class="chat-messages-container">
+          <div class="chat-messages" id="chatMessages"></div>
         </div>
 
-        <div class="chat-messages" id="chatMessages">
-          </div>
-
-        <form class="chat-input-area" id="messageForm">
-          <button type="button" class="attach-btn">+</button>
-          <input type="text" id="chatInput" placeholder="Message..." autocomplete="off">
-          <button type="submit" class="send-btn">Send</button>
-        </form>
+        <footer class="chat-footer">
+          <button type="button" class="footer-btn">😊</button>
+          <button type="button" class="footer-btn">📎</button>
+          <form class="message-input-form" id="messageForm">
+            <input type="text" id="chatInput" placeholder="Type a message" autocomplete="off">
+            <button type="submit" class="send-btn" id="sendBtn">
+              <svg viewBox="0 0 24 24" width="24" height="24">
+                <path fill="currentColor"
+                  d="M1.101 21.757L23.8 12.028 1.101 2.3l.011 7.912 13.623 1.816-13.623 1.817-.011 7.912z"></path>
+              </svg>
+            </button>
+          </form>
+          <button type="button" class="footer-btn">🎙️</button>
+        </footer>
       </div>
-    </section>
+    </main>
   </div>
 
   <nav class="mobile-nav">
@@ -61,6 +104,7 @@
     <button onclick="location.href='settings.html'">⚙️</button>
   </nav>
 
-  <script src="../scripts/features/messages/messages.js"></script>
+  <script type="module" src="../scripts/features/messages/messages.js"></script>
 </body>
+
 </html>
