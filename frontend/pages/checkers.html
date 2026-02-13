@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Checkers | ZIMIG</title>
+    <link rel="stylesheet" href="../styles/style1.css">
+    <link rel="stylesheet" href="../styles/checkers.css">
+</head>
+
+<body class="dark-theme">
+    <div class="game-container">
+        <header class="game-header">
+            <button class="back-btn" onclick="location.href='explore.html'">←</button>
+            <h1>CHECKERS</h1>
+            <div id="status-msg" class="status-badge">Connecting...</div>
+        </header>
+
+        <div id="game-board" class="checkers-board"></div>
+
+        <div class="game-controls">
+            <div class="player-info">
+                <div id="player-color" class="color-indicator"></div>
+                <span id="player-name">Waiting...</span>
+            </div>
+            <button id="rematchBtn" class="action-btn" style="display: none;">REMATCH</button>
+        </div>
+    </div>
+
+    <script src="/socket.io/socket.io.js"></script>
+    <script type="module" src="../scripts/features/games/checkers.js"></script>
+</body>
+
+</html>
