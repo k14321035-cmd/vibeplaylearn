@@ -12,7 +12,7 @@ export const uploadStory = async (req, res) => {
 
     // ENSURE THIS IS "new Story" AND NOT "new Post"
     const newStory = new Story({
-      owner: req.user._id, 
+      owner: req.user._id,
       mediaUrl,
       mediaType
     });
@@ -23,12 +23,22 @@ export const uploadStory = async (req, res) => {
     res.status(500).json({ error: error.message });
   }
 };
+
 export const getFeedStories = async (req, res) => {
   try {
     // Logic: Fetch stories from the user and their following list
     // For now, let's fetch all active stories to test
     const stories = await Story.find().populate("owner", "username profilePic");
     res.status(200).json(stories);
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+};
+
+export const deleteAllStories = async (req, res) => {
+  try {
+    await Story.deleteMany({});
+    res.status(200).json({ message: "All stories deleted successfully" });
   } catch (error) {
     res.status(500).json({ error: error.message });
   }
