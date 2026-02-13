@@ -1,211 +1,37 @@
-/* chess.css - VIBE Design System */
-
-:root {
-  --bg-primary: #0a0a0a;
-  --bg-card: #1a1a1a;
-  --accent-1: #00ff88;
-  --accent-2: #ff0066;
-  --accent-3: #00ccff;
-  --text-primary: #ffffff;
-  --text-secondary: #a0a0a0;
-  --border: #2a2a2a;
-}
-
-* {
-  margin: 0;
-  padding: 0;
-  box-sizing: border-box;
-}
-
-body {
-  font-family: 'DM Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
-  background: var(--bg-primary);
-  color: var(--text-primary);
-  min-height: 100vh;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  padding: 20px;
-}
-
-.chess-container {
-  background: var(--bg-card);
-  border: 2px solid var(--border);
-  border-radius: 16px;
-  padding: 32px;
-  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.5);
-  max-width: 600px;
-  width: 100%;
-}
-
-#status, #status-msg {
-  font-family: 'JetBrains Mono', monospace;
-  font-size: 20px;
-  font-weight: 700;
-  text-align: center;
-  margin-bottom: 24px;
-  background: linear-gradient(135deg, var(--accent-1), var(--accent-3));
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  background-clip: text;
+#board {
+    width: 90vw;
+    max-width: 500px;
+    margin: 20px auto;
 }
 
 .game-info {
-  text-align: center;
-  margin-bottom: 20px;
+    text-align: center;
+    padding: 20px;
 }
 
-.btn {
-  padding: 10px 20px;
-  background: var(--accent-2);
-  border: none;
-  color: white;
-  border-radius: 8px;
-  cursor: pointer;
-  font-weight: bold;
-  font-family: 'DM Sans', sans-serif;
-  transition: transform 0.2s;
+.status {
+    font-family: 'JetBrains Mono', monospace;
+    color: #4ecca3;
+    font-size: 1.2rem;
+    margin-bottom: 20px;
 }
 
-.btn:active {
-  transform: scale(0.95);
+/* Move Highlighting */
+.highlight-move {
+    box-shadow: inset 0 0 15px rgba(78, 204, 163, 0.5);
+    background-color: rgba(78, 204, 163, 0.2) !important;
 }
 
-.btn:disabled {
-  background: #555;
-  cursor: not-allowed;
+.highlight-selected {
+    box-shadow: inset 0 0 15px rgba(233, 69, 96, 0.5);
+    background-color: rgba(233, 69, 96, 0.3) !important;
 }
 
-.btn-exit {
-  background: #333;
-  margin-left: 10px;
+/* Board orientation adjustments if needed */
+.flipped {
+    transform: rotate(180deg);
 }
 
-#board {
-  width: 80vmin !important;
-  height: 80vmin !important;
-  max-width: 800px;
-  max-height: 800px;
-  margin: 0 auto;
-  border-radius: 4px; /* Reduced radius for cleaner board edges */
-  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.5);
-}
-
-#error-message {
-  text-align: center;
-  padding: 12px;
-  background: rgba(255, 0, 102, 0.1);
-  border: 1px solid var(--accent-2);
-  border-radius: 8px;
-  font-size: 14px;
-  animation: shake 0.3s;
-}
-
-@keyframes shake {
-  0%, 100% { transform: translateX(0); }
-  25% { transform: translateX(-8px); }
-  75% { transform: translateX(8px); }
-}
-
-/* Override ChessboardJS default styles */
-.board-b72b1 {
-  border: 2px solid var(--border) !important;
-}
-
-/* Light squares */
-.white-1e1d7 {
-  background-color: #e8e8e8 !important;
-}
-
-/* Dark squares */
-.black-3c85d {
-  background-color: #4a4a4a !important;
-}
-
-/* Highlighted squares (for moves) */
-.highlight1-32417,
-.highlight2-9c5d2 {
-  box-shadow: inset 0 0 3px 3px var(--accent-1) !important;
-}
-
-/* Piece dragging */
-.piece-417db {
-  cursor: grab !important;
-}
-
-.piece-417db:active {
-  cursor: grabbing !important;
-}
-
-/* Notation on squares */
-.notation-322f9 {
-  font-family: 'JetBrains Mono', monospace !important;
-  font-size: 11px !important;
-  color: #666 !important;
-}
-
-/* Responsive */
-@media (max-width: 600px) {
-  body {
-    padding: 0;
-    justify-content: flex-start; /* Align to top on mobile */
-    padding-top: 20px;
-  }
-
-  .chess-container {
-    padding: 0;
-    border: none;
-    box-shadow: none;
-  }
-
-  #board {
-    width: 100vw !important;
-    height: 100vw !important;
-    max-width: 100% !important;
-    max-height: 100% !important;
-    border-radius: 0;
-    box-shadow: none;
-  }
-
-  .game-info {
-    margin-top: 15px;
-    padding: 10px;
-    width: 100%;
-    display: flex;
-    flex-direction: row;
-    align-items: center;
-    justify-content: space-between;
-    background: var(--bg-card);
-    border-top: 1px solid var(--border);
-    position: fixed;
-    bottom: 0;
-    left: 0;
-    z-index: 10;
-  }
-
-  #status, #status-msg {
-    font-size: 14px;
-    margin-bottom: 0;
-    text-align: left;
-    flex-grow: 1;
-  }
-
-  .btn {
-    padding: 8px 16px;
-    font-size: 14px;
-    margin-left: 10px;
-  }
-}
-
-/* PC Specific tweaks to ensure "normal" size */
-@media (min-width: 601px) {
-    #board {
-        /* Revert to vmin or fixed size */
-        width: 70vmin !important;
-        height: 70vmin !important;
-    }
-    
-    .game-info {
-        margin-top: 20px;
-    }
+.flipped .square-55d63 > img {
+    transform: rotate(180deg);
 }
