@@ -86,17 +86,15 @@ io.on("connection", socket => {
     io.to(senderId).emit("newMessage", populated);
   });
 
+  // GAMES
+  initTicTacToe(io, socket);
+  initChess(io, socket);
+  initCheckers(io, socket);
+
   socket.on("disconnect", () => {
     console.log("❌ Socket disconnected:", socket.id);
   });
 });
-
-/* =========================
-   GAME INITIALIZATION (ONCE)
-   ========================= */
-initTicTacToe(io);
-initChess(io);
-initCheckers(io);
 
 /* =========================
    START
