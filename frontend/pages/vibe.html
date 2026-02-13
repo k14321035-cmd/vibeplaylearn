@@ -74,9 +74,6 @@
       </div>
 
       <div class="header-actions">
-        <button class="icon-btn">🏠</button>
-        <button class="icon-btn" onclick="location.href='reels.html'">🎬</button>
-        <button class="icon-btn" onclick="location.href='explore.html'">🎮</button>
         <button class="icon-btn" onclick="location.href='notifications.html'">🔔</button>
         <button class="post-btn" onclick="openPostModal()">POST</button>
       </div>
@@ -94,6 +91,7 @@
         <div class="nav-item" onclick="location.href='messages.html'">💬 Messages</div>
         <div class="nav-item" onclick="location.href='profile.html'">👤 Profile</div>
         <div class="nav-item" onclick="location.href='settings.html'">⚙️ Settings</div>
+        <button class="icon-btn" onclick="location.href='reels.html'">🎬</button>
       </div>
     </aside>
 
@@ -419,14 +417,14 @@
     document.addEventListener("DOMContentLoaded", fetchAndRenderPosts);
   </script>
   <nav class="mobile-nav">
-  <button onclick="location.href='vibe.html'">🏠</button>
+  <button class="icon-btn" onclick="location.href='explore.html'">🎮</button>
   <button onclick="location.href='reels.html'">🎬</button>
   <button onclick="location.href='messages.html'">💬</button>
-  <button onclick="location.href='profile.html'">👤</button>
   <button onclick="location.href='settings.html'">⚙️</button>
 </nav>
 </body>
 
 
 </html>
+
 
