@@ -5,11 +5,12 @@ const findMatchBtn = document.getElementById("findMatchBtn"); // Kept reference 
 // Variables
 let board = null;
 // Fix for ReferenceError: explicit window access
-const ChessClass = window.Chess || Chess; 
+const ChessClass = window.Chess || Chess;
 let game = new ChessClass();
 let socket = io();
 let roomId = null;
 let playerColor = null;
+let selectedSquare = null;
 
 // Initialize Board
 function onDragStart(source, piece, position, orientation) {
@@ -40,6 +41,67 @@ function onDrop(source, target) {
 
 function onSnapEnd() {
     board.position(game.fen());
+    removeHighlights();
+}
+
+function highlightSquare(square) {
+    const $square = $('#board .square-' + square);
+    $square.addClass('highlight-selected');
+}
+
+function removeHighlights() {
+    $('#board .square-55d63').removeClass('highlight-selected highlight-move');
+}
+
+function highlightMoves(square) {
+    const moves = game.moves({
+        square: square,
+        verbose: true
+    });
+
+    if (moves.length === 0) return;
+
+    moves.forEach(function (move) {
+        $('#board .square-' + move.to).addClass('highlight-move');
+    });
+}
+
+function onSquareClick(square) {
+    if (game.game_over() || game.turn() !== playerColor) return;
+
+    // 1. If we clicked a piece of our color, select it and show moves
+    const piece = game.get(square);
+    if (piece && piece.color === playerColor) {
+        removeHighlights();
+        selectedSquare = square;
+        highlightSquare(square);
+        highlightMoves(square);
+        return;
+    }
+
+    // 2. If we already have a selected square, try to move there
+    if (selectedSquare) {
+        const move = game.move({
+            from: selectedSquare,
+            to: square,
+            promotion: 'q'
+        });
+
+        if (move) {
+            socket.emit("chessMove", {
+                roomId,
+                move: { from: selectedSquare, to: square, promotion: 'q' }
+            });
+            board.position(game.fen());
+            updateStatus();
+            removeHighlights();
+            selectedSquare = null;
+        } else {
+            // If click was invalid, clear or re-select
+            removeHighlights();
+            selectedSquare = null;
+        }
+    }
 }
 
 function updateStatus() {
@@ -70,6 +132,13 @@ const config = {
 };
 
 board = Chessboard('board', config);
+
+// Add click listener to squares
+$('#board').on('click', '.square-55d63', function () {
+    const square = $(this).attr('data-square');
+    onSquareClick(square);
+});
+
 $(window).resize(board.resize);
 
 // --- Socket Events ---
@@ -89,12 +158,12 @@ socket.on("chessGameStart", (data) => {
     board.position(data.fen);
 
     statusMsg.innerText = `Game Started! You are ${playerColor === 'w' ? 'White' : 'Black'}.`;
-    if(findMatchBtn) findMatchBtn.style.display = "none";
+    if (findMatchBtn) findMatchBtn.style.display = "none";
 });
 
 socket.on("waitingForOpponent", () => {
     statusMsg.innerText = "Waiting for an opponent...";
-    if(findMatchBtn) findMatchBtn.style.display = "none";
+    if (findMatchBtn) findMatchBtn.style.display = "none";
 });
 
 socket.on("chessUpdate", (data) => {
