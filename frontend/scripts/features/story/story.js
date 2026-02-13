@@ -1,5 +1,5 @@
 // frontend/scripts/features/story/story.js
-import { API_BASE_URL, BACKEND_URL } from "../../core/config.js";
+import { API_BASE_URL, BACKEND_URL, getMediaPath } from "../../core/config.js";
 async function handleDirectStoryUpload(event) {
     const file = event.target.files[0];
     if (!file) return;
@@ -52,13 +52,13 @@ async function fetchStories() {
         stories.forEach(story => {
             const username = story.owner?.username || "user";
             const profilePic = story.owner?.profilePic
-                ? (story.owner.profilePic.startsWith('http') ? story.owner.profilePic : `${BACKEND_URL}${story.owner.profilePic}`)
-                : '../assets/default-avatar.png';
+                ? getMediaPath(story.owner.profilePic)
+                : '../../../../assets/default-avatar.svg';
 
             html += `
-                <div class="story-item" onclick="viewStory('${BACKEND_URL}${story.mediaUrl}', '${username}')">
+                <div class="story-item" onclick="viewStory('${getMediaPath(story.mediaUrl)}', '${username}')">
                     <div class="story-ring">
-                        <img src="${profilePic}" class="story-avatar" />
+                        <img src="${profilePic}" class="story-avatar" onerror="this.src='../../../../assets/default-avatar.svg'" />
                     </div>
                     <div class="story-username">${username}</div>
                 </div>
