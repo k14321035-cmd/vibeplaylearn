@@ -37,7 +37,8 @@ async function handleDirectStoryUpload(event) {
     }
 }
 async function fetchStories() {
-    const container = document.querySelector(".story-carousel");
+    const container = document.getElementById("dynamicStories");
+    if (!container) return;
     const token = localStorage.getItem("token");
 
     try {
@@ -46,23 +47,18 @@ async function fetchStories() {
         });
         const stories = await res.json();
 
-        // 1. Keep the "Add Story" button as the first item
-        let html = `
-            <div class="story-item" onclick="openStoryUpload()">
-                <div class="story-ring add-story">
-                    <div class="story-avatar">+</div>
-                </div>
-                <div class="story-username">Add Story</div>
-            </div>
-        `;
-
-        // 2. Add the dynamic stories
+        let html = "";
+        // Add the dynamic stories
         stories.forEach(story => {
             const username = story.owner?.username || "user";
+            const profilePic = story.owner?.profilePic
+                ? (story.owner.profilePic.startsWith('http') ? story.owner.profilePic : `${BACKEND_URL}${story.owner.profilePic}`)
+                : '../assets/default-avatar.png';
+
             html += `
                 <div class="story-item" onclick="viewStory('${BACKEND_URL}${story.mediaUrl}', '${username}')">
                     <div class="story-ring">
-                        <img src="${story.owner?.profilePic || '../assets/default-avatar.png'}" class="story-avatar" />
+                        <img src="${profilePic}" class="story-avatar" />
                     </div>
                     <div class="story-username">${username}</div>
                 </div>
@@ -112,3 +108,13 @@ function closeStoryViewer() {
 
 // Initialize on load
 document.addEventListener("DOMContentLoaded", fetchStories);
+
+function openStoryUpload() {
+    document.getElementById('storyFileInput').click();
+}
+
+window.handleDirectStoryUpload = handleDirectStoryUpload;
+window.viewStory = viewStory;
+window.closeStoryViewer = closeStoryViewer;
+window.openStoryUpload = openStoryUpload;
+window.fetchStories = fetchStories;
