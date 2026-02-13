@@ -1,6 +1,6 @@
 import { getToken, getCurrentUser } from "../../core/auth.js";
 import { io } from "https://cdn.socket.io/4.7.5/socket.io.esm.min.js";
-import { API_BASE_URL, BACKEND_URL } from "../../core/config.js";
+import { API_BASE_URL, BACKEND_URL, getMediaPath } from "../../core/config.js";
 
 const socket = io(BACKEND_URL, {
   auth: {
@@ -49,9 +49,13 @@ function renderChatList(searchTerm = "") {
     c.username.toLowerCase().includes(searchTerm.toLowerCase())
   );
 
-  chatList.innerHTML = filtered.map(chat => `
+  chatList.innerHTML = filtered.map(chat => {
+    const avatarUrl = chat.avatar ? getMediaPath(chat.avatar) : null;
+    return `
     <div class="chat-item ${chat.userId === currentChatUser ? 'active' : ''}" onclick="loadChat('${chat.userId}')">
-      <div class="post-avatar">${chat.username[0].toUpperCase()}</div>
+      <div class="post-avatar" ${avatarUrl ? `style="background-image: url(${avatarUrl}); background-size: cover; color: transparent;"` : ''}>
+        ${!avatarUrl ? chat.username[0].toUpperCase() : ''}
+      </div>
       <div class="chat-item-content">
         <div class="chat-item-header">
           <strong class="chat-item-name">${chat.username}</strong>
@@ -61,7 +65,7 @@ function renderChatList(searchTerm = "") {
       </div>
       ${chat.unread > 0 ? `<div class="unread-badge">${chat.unread}</div>` : ''}
     </div>
-  `).join("");
+  `}).join("");
 }
 
 // Populate my profile
@@ -107,12 +111,18 @@ export async function loadChat(userId) {
 
   // Update Header
   if (chatUsername) chatUsername.textContent = chatUser.username;
-  if (typeof chatAvatar !== "undefined" && chatUser.avatar) {
-    // If chatAvatar is an img tag
-    if (chatAvatar.tagName === "IMG") chatAvatar.src = chatUser.avatar;
-    else chatAvatar.textContent = chatUser.username[0].toUpperCase();
-  } else if (chatAvatar) {
-    chatAvatar.textContent = chatUser.username ? chatUser.username[0].toUpperCase() : "?";
+
+  const chatAvatar = document.getElementById("chatAvatar");
+  if (chatAvatar) {
+    if (chatUser.avatar) {
+      const avatarUrl = getMediaPath(chatUser.avatar);
+      chatAvatar.style.backgroundImage = `url(${avatarUrl})`;
+      chatAvatar.style.backgroundSize = "cover";
+      chatAvatar.textContent = "";
+    } else {
+      chatAvatar.style.backgroundImage = "none";
+      chatAvatar.textContent = chatUser.username ? chatUser.username[0].toUpperCase() : "?";
+    }
   }
 
   chatMessages.innerHTML = "";
