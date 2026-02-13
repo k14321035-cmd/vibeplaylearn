@@ -18,6 +18,7 @@ import Message from "./models/message.model.js";
 import notificationRoutes from "./routes/notification.routes.js";
 import { initTicTacToe } from "./games/tictactoe/ttt.socket.js";
 import { initChess } from "./games/chess/chess.socket.js";
+import { initCheckers } from "./games/checkers/checkers.socket.js";
 
 // ... (existing code)
 
@@ -85,15 +86,17 @@ io.on("connection", socket => {
     io.to(senderId).emit("newMessage", populated);
   });
 
-  // GAMES (IMPORTANT)
-  initTicTacToe(io, socket);
-  initChess(io, socket);
-  
-
   socket.on("disconnect", () => {
     console.log("❌ Socket disconnected:", socket.id);
   });
 });
+
+/* =========================
+   GAME INITIALIZATION (ONCE)
+   ========================= */
+initTicTacToe(io);
+initChess(io);
+initCheckers(io);
 
 /* =========================
    START
