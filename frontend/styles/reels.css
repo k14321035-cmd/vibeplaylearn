@@ -1,378 +1,866 @@
-/* Make the container take the whole screen and snap */
-.reels-container {
-  height: 100vh;
-  overflow-y: scroll;
-  scroll-snap-type: y mandatory; /* This makes it feel like TikTok/Reels */
-  scrollbar-width: none; /* Hide scrollbar for Firefox */
+/* ═══════════════════════════════════════════════════════════════════
+   VIBE REELS - PREMIUM CSS
+   TikTok-inspired vertical video feed with VIBE aesthetic magic
+   ═══════════════════════════════════════════════════════════════════ */
+
+/* ─── Design Philosophy ───
+   • Full-screen immersive vertical videos
+   • Smooth snap scrolling between reels
+   • Floating glassmorphic UI elements
+   • Cinematic animations & transitions
+   • Neon accent colors on dark background
+   • Touch-optimized mobile-first design
+*/
+
+/* ═══════════════════════════════════════════════════════════════════
+   CSS VARIABLES - VIBE Design System
+   ═══════════════════════════════════════════════════════════════════ */
+:root {
+  /* Colors */
+  --bg-primary: #000000;
+  --bg-overlay: rgba(0, 0, 0, 0.7);
+  --bg-glass: rgba(20, 20, 20, 0.6);
+  --bg-modal: rgba(10, 10, 10, 0.95);
+  
+  --accent-1: #00ff88;      /* Neon Green */
+  --accent-2: #ff0066;      /* Hot Pink */
+  --accent-3: #00ccff;      /* Cyan */
+  --accent-gradient: linear-gradient(135deg, var(--accent-1), var(--accent-3));
+  
+  --text-primary: #ffffff;
+  --text-secondary: #e0e0e0;
+  --text-muted: #888888;
+  
+  --border: rgba(255, 255, 255, 0.1);
+  --border-glow: rgba(0, 255, 136, 0.5);
+  
+  /* Shadows */
+  --shadow-sm: 0 2px 12px rgba(0, 0, 0, 0.5);
+  --shadow-md: 0 4px 24px rgba(0, 0, 0, 0.6);
+  --shadow-lg: 0 8px 40px rgba(0, 0, 0, 0.7);
+  --shadow-neon: 0 0 20px rgba(0, 255, 136, 0.6);
+  
+  /* Spacing */
+  --spacing-xs: 4px;
+  --spacing-sm: 8px;
+  --spacing-md: 16px;
+  --spacing-lg: 24px;
+  --spacing-xl: 32px;
+  
+  /* Border Radius */
+  --radius-sm: 8px;
+  --radius-md: 12px;
+  --radius-lg: 20px;
+  --radius-xl: 24px;
+  --radius-full: 50%;
+  
+  /* Z-Index Layers */
+  --z-video: 1;
+  --z-overlay: 10;
+  --z-controls: 20;
+  --z-modal: 1000;
 }
 
-.reels-container::-webkit-scrollbar {
-  display: none; /* Hide scrollbar for Chrome/Safari */
+/* ═══════════════════════════════════════════════════════════════════
+   RESET & BASE
+   ═══════════════════════════════════════════════════════════════════ */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+  -webkit-tap-highlight-color: transparent;
 }
 
-/* Each reel occupies exactly one screen height */
-.reel-slide {
-  height: 100vh;
-  width: 100%;
-  scroll-snap-align: start;
-  position: relative;
-  background: #000;
-}
-
-.reel-video {
+html,
+body {
   width: 100%;
   height: 100%;
-  object-fit: cover; /* Important: prevents black bars on video */
+  overflow: hidden;
+  background: var(--bg-primary);
+  color: var(--text-primary);
+  font-family: 'DM Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
 }
 
-/* Footer area for the Upload Button */
-.reels-footer {
-  position: fixed;
-  bottom: 80px; /* Sits above the mobile-nav */
-  width: 100%;
-  display: flex;
-  justify-content: center;
-  z-index: 10;
-  pointer-events: none; /* Allows clicking video behind it, except for the button */
-}
-
-.add-reel-btn {
-  pointer-events: auto;
-  background: rgba(96, 52, 52, 0.2);
-  backdrop-filter: blur(10px);
-  border: 1px solid rgba(102, 47, 47, 0.3);
-  padding: 10px 20px;
-  border-radius: 30px;
-  color: rgb(195, 128, 128);
-  font-weight: bold;
+button {
+  font-family: inherit;
   cursor: pointer;
-  box-shadow: 0 4px 15px rgba(0,0,0,0.3);
+  border: none;
+  background: none;
+  outline: none;
+  -webkit-tap-highlight-color: transparent;
 }
 
-/* Modal Styling */
-.upload-modal {
-  display: none;
+/* ═══════════════════════════════════════════════════════════════════
+   REELS CONTAINER - Vertical Snap Scroll
+   ═══════════════════════════════════════════════════════════════════ */
+.reels-container {
   position: fixed;
-  inset: 0;
-  background: rgba(0,0,0,0.9);
-  z-index: 1000;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  overflow-y: scroll;
+  overflow-x: hidden;
+  scroll-snap-type: y mandatory;
+  scroll-behavior: smooth;
+  -webkit-overflow-scrolling: touch;
+}
+
+/* Hide scrollbar but keep functionality */
+.reels-container::-webkit-scrollbar {
+  display: none;
+}
+
+.reels-container {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+
+/* ═══════════════════════════════════════════════════════════════════
+   REEL ITEM - Full Screen Video Card
+   ═══════════════════════════════════════════════════════════════════ */
+.reel-item {
+  position: relative;
+  width: 100vw;
+  height: 100vh;
+  scroll-snap-align: start;
+  scroll-snap-stop: always;
+  display: flex;
   align-items: center;
   justify-content: center;
+  background: var(--bg-primary);
+  overflow: hidden;
 }
 
-.upload-modal.active {
+/* Video Element */
+.reel-item video {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  min-width: 100%;
+  min-height: 100%;
+  width: auto;
+  height: auto;
+  object-fit: cover;
+  z-index: var(--z-video);
+}
+
+/* Gradient Overlays for Better Text Readability */
+.reel-item::before {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: 50%;
+  background: linear-gradient(
+    to top,
+    rgba(0, 0, 0, 0.9) 0%,
+    rgba(0, 0, 0, 0.6) 30%,
+    transparent 100%
+  );
+  z-index: var(--z-overlay);
+  pointer-events: none;
+}
+
+.reel-item::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 30%;
+  background: linear-gradient(
+    to bottom,
+    rgba(0, 0, 0, 0.7) 0%,
+    rgba(0, 0, 0, 0.3) 50%,
+    transparent 100%
+  );
+  z-index: var(--z-overlay);
+  pointer-events: none;
+}
+
+/* ═══════════════════════════════════════════════════════════════════
+   REEL INFO OVERLAY - Bottom Left
+   ═══════════════════════════════════════════════════════════════════ */
+.reel-info {
+  position: absolute;
+  bottom: 100px;
+  left: 20px;
+  right: 90px;
+  z-index: var(--z-controls);
+  animation: slideUpFade 0.6s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+@keyframes slideUpFade {
+  from {
+    opacity: 0;
+    transform: translateY(30px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* User Info */
+.reel-user {
   display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 16px;
 }
 
-/* --- Overlay / Backdrop --- */
-.upload-modal {
-    display: none; /* Hidden by default */
-    position: fixed;
-    inset: 0;
-    background: rgba(0, 0, 0, 0.85);
-    backdrop-filter: blur(8px);
-    z-index: 2000; /* Ensure it's above everything */
-    align-items: center;
-    justify-content: center;
-    padding: 20px;
+.reel-avatar {
+  width: 44px;
+  height: 44px;
+  border-radius: var(--radius-full);
+  background: var(--accent-gradient);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 700;
+  font-size: 18px;
+  box-shadow: 0 0 12px rgba(0, 255, 136, 0.5);
+  border: 2px solid rgba(255, 255, 255, 0.2);
+  cursor: pointer;
+  transition: transform 0.3s ease;
 }
 
-/* Show modal when 'active' class is added via JS */
-.upload-modal.active {
-    display: flex;
-}
-
-/* --- Modal Card --- */
-.modal-content {
-    background: #1a1a1a;
-    border: 1px solid rgba(255, 255, 255, 0.1);
-    width: 100%;
-    max-width: 400px;
-    border-radius: 20px;
-    padding: 24px;
-    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.4);
-}
-
-/* --- Header --- */
-.modal-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    margin-bottom: 20px;
-}
-
-.modal-header h3 {
-    color: #fff;
-    font-size: 1.2rem;
-    font-weight: 600;
-}
-
-.modal-header button {
-    background: none;
-    border: none;
-    color: #888;
-    font-size: 1.5rem;
-    cursor: pointer;
-    transition: color 0.2s;
-}
-
-.modal-header button:hover {
-    color: #fff;
-}
-
-/* --- Form Elements --- */
-#reelForm {
-    display: flex;
-    flex-direction: column;
-    gap: 16px;
-}
-
-/* Styling the File Input */
-#reelVideo {
-    background: rgba(61, 46, 128, 0.05);
-    border: 2px dashed rgba(255, 255, 255, 0.2);
-    padding: 10px;
-    border-radius: 12px;
-    color: #ccc;
-    cursor: pointer;
-    width: 90%;
-}
-
-#reelVideo:hover {
-    border-color: #27b8c8;
-    background: rgba(80, 8, 196, 0.05);
-}
-
-/* Styling the Caption Textarea */
-#reelCaption {
-    background: #262626;
-    border: 1px solid #363636;
-    border-radius: 12px;
-    padding: 12px;
-    color: #fff;
-    resize: none;
-    min-height: 100px;
-    outline: none;
-    font-size: 0.95rem;
-}
-
-#reelCaption:focus {
-    border-color: #555;
-}
-
-/* Container for everything that sits on top of the video */
-.reel-overlay {
-    position: absolute;
-    bottom: 0;
-    left: 0;
-    width: 100%;
-    height: 40%; /* Only covers the bottom portion */
-    background: linear-gradient(transparent, rgba(0, 0, 0, 0.7));
-    display: flex;
-    flex-direction: column;
-    justify-content: flex-end;
-    padding: 20px 80px 30px 15px; /* Extra padding on right for buttons */
-    z-index: 5;
-    pointer-events: none; /* Allows clicks to pass through to the video */
-}
-
-.reel-content {
-    color: white;
-    max-width: 85%;
+.reel-avatar:hover {
+  transform: scale(1.1);
 }
 
 .reel-username {
-    font-size: 17px;
-    font-weight: 700;
-    margin-bottom: 8px;
-    cursor: pointer;
-    pointer-events: auto;
+  font-weight: 700;
+  font-size: 16px;
+  color: var(--text-primary);
+  text-shadow: 0 2px 8px rgba(0, 0, 0, 0.8);
+  letter-spacing: 0.3px;
 }
 
-.reel-description {
-    font-size: 14px;
-    line-height: 1.3;
-    margin-bottom: 12px;
-    display: -webkit-box;
-    -webkit-line-clamp: 2; /* Limits to 2 lines like TikTok */
-    -webkit-box-orient: vertical;
-    overflow: hidden;
+/* Follow Button */
+.follow-btn {
+  padding: 6px 20px;
+  background: transparent;
+  border: 2px solid var(--accent-1);
+  border-radius: var(--radius-lg);
+  color: var(--accent-1);
+  font-weight: 700;
+  font-size: 13px;
+  font-family: 'JetBrains Mono', monospace;
+  letter-spacing: 0.5px;
+  text-transform: uppercase;
+  margin-left: auto;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  box-shadow: 0 0 0 0 rgba(0, 255, 136, 0);
 }
 
-/* Music scrolling effect */
-.reel-music {
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    font-size: 13px;
-    width: fit-content;
+.follow-btn:hover {
+  background: var(--accent-1);
+  color: #000000;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 16px rgba(0, 255, 136, 0.4);
 }
 
-.music-name {
-    white-space: nowrap;
-    overflow: hidden;
-    animation: scrollMusic 8s linear infinite;
+.follow-btn:active {
+  transform: translateY(0);
 }
 
-@keyframes scrollMusic {
-    0% { transform: translateX(0); }
-    100% { transform: translateX(-20%); }
-}
-
-/* Sidebar buttons */
-.reel-actions {
-    position: absolute;
-    right: 12px;
-    bottom: 120px;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    gap: 20px;
-    z-index: 20;
-}
-
-.action-item {
-    background: none;
-    border: none;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    color: white;
-    cursor: pointer;
-    transition: transform 0.1s ease;
-    text-shadow: 0 2px 4px rgba(0, 0, 0, 0.5); /* Makes white icons visible on light videos */
-}
-.action-item {
-    font-size: 28px; /* Standard IG icon size */
-}
-.action-item span {
-    font-size: 12px;
-    font-weight: 600;
-    margin-top: 4px;
-    text-shadow: 0 1px 2px rgba(0, 0, 0, 0.8);
-}
-/* Interactive Feedback */
-.action-item:active {
-    transform: scale(0.85);
-}
-
-.action-item:hover {
-    opacity: 0.8;
-}
-/* --- Submit Button --- */
-.submit-btn {
-    background: #0095f6; /* Vibe Blue */
-    color: white;
-    border: none;
-    padding: 14px;
-    border-radius: 12px;
-    font-weight: 700;
-    font-size: 1rem;
-    cursor: pointer;
-    transition: background 0.2s, transform 0.1s;
-}
-
-.submit-btn:hover {
-    background: #1877f2;
-}
-
-.submit-btn:active {
-    transform: scale(0.98);
-}
-
-.submit-btn:disabled {
-    background: #555;
-    cursor: not-allowed;
-    opacity: 0.6;
-}
-/* Each reel container */
-.reel {
-    position: relative;
-    width: 100%;
-    height: 100vh; /* Full viewport height */
-    scroll-snap-align: start; /* Critical for the snappy scroll effect */
-    background: #000;
-    overflow: hidden;
-    display: flex;
-    flex-direction: column;
-    justify-content: flex-end; /* Keeps caption at the bottom */
-}
-
-/* The Video Background */
-.reel video {
-    position: absolute;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    object-fit: cover; /* Ensures video fills screen without stretching */
-    z-index: 1;
-}
-
-/* Action Sidebar (Likes, Comments, Share) */
-
-.reel-actions button {
-    background: rgba(0, 0, 0, 0.3);
-    backdrop-filter: blur(5px);
-    border: none;
-    color: white;
-    font-size: 24px;
-    width: 50px;
-    height: 50px;
-    border-radius: 50%;
-    cursor: pointer;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    transition: transform 0.2s, background 0.2s;
-}
-
-.reel-actions button:hover {
-    background: rgba(255, 255, 255, 0.2);
-    transform: scale(1.1);
-}
-
-.reel-actions button:active {
-    transform: scale(0.9);
-}
-
-/* Caption and Username Overlay */
+/* Caption */
 .reel-caption {
-    position: relative;
-    z-index: 10;
-    padding: 20px;
-    padding-bottom: 40px; /* Space for the upload button/nav */
-    background: linear-gradient(transparent, rgba(0, 0, 0, 0.8));
-    color: white;
-    font-size: 15px;
-    line-height: 1.4;
-    width: 100%;
+  font-size: 15px;
+  line-height: 1.6;
+  color: var(--text-secondary);
+  text-shadow: 0 2px 8px rgba(0, 0, 0, 0.9);
+  margin-bottom: 12px;
+  display: -webkit-box;
+  -webkit-line-clamp: 3;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
 }
 
-/* Mute/Unmute Indicator (Centered) */
-.mute-indicator {
-    position: absolute;
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%);
-    background: rgba(0, 0, 0, 0.5);
-    color: white;
-    padding: 15px;
-    border-radius: 50%;
-    z-index: 15;
-    opacity: 0; /* Hidden by default */
-    pointer-events: none;
-    transition: opacity 0.3s;
+/* Music / Audio Info */
+.reel-music {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 13px;
+  color: var(--text-muted);
+  text-shadow: 0 2px 8px rgba(0, 0, 0, 0.9);
 }
 
-/* Like Animation Class */
-.like-btn.liked {
-    color: #ff3040;
-    animation: heartBeat 0.3s ease-in-out;
+.reel-music::before {
+  content: '🎵';
+  font-size: 16px;
+  animation: musicPulse 1.5s ease-in-out infinite;
+}
+
+@keyframes musicPulse {
+  0%, 100% { transform: scale(1); opacity: 0.8; }
+  50% { transform: scale(1.2); opacity: 1; }
+}
+
+/* ═══════════════════════════════════════════════════════════════════
+   ACTION BUTTONS - Right Side
+   ═══════════════════════════════════════════════════════════════════ */
+.reel-actions {
+  position: absolute;
+  right: 16px;
+  bottom: 120px;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  z-index: var(--z-controls);
+  animation: slideInRight 0.6s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+@keyframes slideInRight {
+  from {
+    opacity: 0;
+    transform: translateX(40px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+/* Action Button Base */
+.action-btn {
+  position: relative;
+  width: 56px;
+  height: 56px;
+  border-radius: var(--radius-full);
+  background: var(--bg-glass);
+  backdrop-filter: blur(12px);
+  border: 1px solid var(--border);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  color: var(--text-primary);
+  font-size: 24px;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  box-shadow: var(--shadow-sm);
+}
+
+.action-btn:hover {
+  transform: scale(1.1);
+  background: rgba(30, 30, 30, 0.8);
+  border-color: var(--border-glow);
+  box-shadow: var(--shadow-neon);
+}
+
+.action-btn:active {
+  transform: scale(0.95);
+}
+
+/* Action Count */
+.action-count {
+  position: absolute;
+  bottom: -24px;
+  font-size: 12px;
+  font-weight: 700;
+  font-family: 'JetBrains Mono', monospace;
+  color: var(--text-secondary);
+  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.8);
+}
+
+/* Like Button - Special Animation */
+.action-btn.like-btn {
+  font-size: 26px;
+}
+
+.action-btn.like-btn.liked {
+  animation: heartBeat 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+  color: var(--accent-2);
+  border-color: var(--accent-2);
+  box-shadow: 0 0 20px rgba(255, 0, 102, 0.6);
 }
 
 @keyframes heartBeat {
-    0% { transform: scale(1); }
-    50% { transform: scale(1.3); }
-    100% { transform: scale(1); }
+  0%, 100% { transform: scale(1); }
+  25% { transform: scale(1.3); }
+  50% { transform: scale(1.1); }
+}
+
+/* ═══════════════════════════════════════════════════════════════════
+   FOOTER - Create Reel Button
+   ═══════════════════════════════════════════════════════════════════ */
+.reels-footer {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  padding: 20px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background: linear-gradient(
+    to top,
+    rgba(0, 0, 0, 0.95) 0%,
+    rgba(0, 0, 0, 0.8) 50%,
+    transparent 100%
+  );
+  z-index: var(--z-controls);
+  pointer-events: none;
+}
+
+.add-reel-btn {
+  pointer-events: all;
+  padding: 16px 32px;
+  background: var(--accent-gradient);
+  border-radius: var(--radius-xl);
+  color: #000000;
+  font-weight: 800;
+  font-size: 16px;
+  font-family: 'JetBrains Mono', monospace;
+  letter-spacing: 0.5px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  box-shadow: 0 8px 32px rgba(0, 255, 136, 0.4);
+  transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+  position: relative;
+  overflow: hidden;
+}
+
+.add-reel-btn::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(
+    135deg,
+    rgba(255, 255, 255, 0.2),
+    transparent 60%
+  );
+  pointer-events: none;
+}
+
+.add-reel-btn:hover {
+  transform: translateY(-4px) scale(1.05);
+  box-shadow: 0 12px 40px rgba(0, 255, 136, 0.6);
+}
+
+.add-reel-btn:active {
+  transform: translateY(-2px) scale(1.02);
+}
+
+.plus-icon {
+  font-size: 28px;
+  font-weight: 300;
+  line-height: 1;
+}
+
+/* ═══════════════════════════════════════════════════════════════════
+   UPLOAD MODAL
+   ═══════════════════════════════════════════════════════════════════ */
+.upload-modal {
+  position: fixed;
+  inset: 0;
+  background: var(--bg-modal);
+  backdrop-filter: blur(20px);
+  display: none;
+  align-items: center;
+  justify-content: center;
+  z-index: var(--z-modal);
+  animation: fadeIn 0.3s ease;
+}
+
+.upload-modal.active {
+  display: flex;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+/* Modal Content */
+.modal-content {
+  width: 90%;
+  max-width: 500px;
+  background: linear-gradient(
+    145deg,
+    rgba(20, 20, 20, 0.98),
+    rgba(30, 30, 30, 0.98)
+  );
+  border: 2px solid var(--border);
+  border-radius: var(--radius-xl);
+  box-shadow: var(--shadow-lg);
+  overflow: hidden;
+  animation: modalSlideUp 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+@keyframes modalSlideUp {
+  from {
+    opacity: 0;
+    transform: translateY(40px) scale(0.95);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+/* Modal Header */
+.modal-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 24px 28px;
+  border-bottom: 1px solid var(--border);
+  background: rgba(0, 0, 0, 0.3);
+}
+
+.modal-header h3 {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 20px;
+  font-weight: 800;
+  background: var(--accent-gradient);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+.modal-header button {
+  width: 40px;
+  height: 40px;
+  border-radius: var(--radius-sm);
+  background: transparent;
+  border: 2px solid var(--border);
+  color: var(--text-primary);
+  font-size: 24px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.3s ease;
+}
+
+.modal-header button:hover {
+  background: var(--bg-glass);
+  border-color: var(--accent-2);
+  color: var(--accent-2);
+  transform: rotate(90deg);
+}
+
+/* Modal Form */
+#reelForm {
+  padding: 28px;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+/* File Input */
+#reelForm input[type="file"] {
+  padding: 16px;
+  background: var(--bg-glass);
+  border: 2px dashed var(--border);
+  border-radius: var(--radius-md);
+  color: var(--text-secondary);
+  font-size: 14px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+#reelForm input[type="file"]:hover {
+  border-color: var(--accent-1);
+  background: rgba(0, 255, 136, 0.05);
+}
+
+#reelForm input[type="file"]::file-selector-button {
+  padding: 10px 20px;
+  background: var(--accent-gradient);
+  border: none;
+  border-radius: var(--radius-sm);
+  color: #000000;
+  font-weight: 700;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 12px;
+  cursor: pointer;
+  margin-right: 12px;
+  transition: all 0.3s ease;
+}
+
+#reelForm input[type="file"]::file-selector-button:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(0, 255, 136, 0.4);
+}
+
+/* Textarea */
+#reelCaption {
+  width: 100%;
+  min-height: 120px;
+  padding: 16px;
+  background: var(--bg-glass);
+  border: 2px solid var(--border);
+  border-radius: var(--radius-md);
+  color: var(--text-primary);
+  font-size: 15px;
+  font-family: 'DM Sans', sans-serif;
+  resize: vertical;
+  transition: all 0.3s ease;
+}
+
+#reelCaption::placeholder {
+  color: var(--text-muted);
+}
+
+#reelCaption:focus {
+  outline: none;
+  border-color: var(--accent-1);
+  box-shadow: 0 0 0 4px rgba(0, 255, 136, 0.15);
+  background: rgba(0, 255, 136, 0.03);
+}
+
+/* Submit Button */
+.submit-btn {
+  width: 100%;
+  padding: 16px;
+  background: var(--accent-gradient);
+  border-radius: var(--radius-md);
+  color: #000000;
+  font-weight: 800;
+  font-size: 16px;
+  font-family: 'JetBrains Mono', monospace;
+  letter-spacing: 0.5px;
+  text-transform: uppercase;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  box-shadow: 0 4px 16px rgba(0, 255, 136, 0.3);
+  position: relative;
+  overflow: hidden;
+}
+
+.submit-btn::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(
+    135deg,
+    rgba(255, 255, 255, 0.3),
+    transparent 60%
+  );
+  pointer-events: none;
+}
+
+.submit-btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 24px rgba(0, 255, 136, 0.5);
+}
+
+.submit-btn:active {
+  transform: translateY(0);
+}
+
+/* Loading State */
+.submit-btn.loading {
+  pointer-events: none;
+  opacity: 0.7;
+}
+
+.submit-btn.loading::after {
+  content: '';
+  position: absolute;
+  width: 20px;
+  height: 20px;
+  border: 3px solid #000000;
+  border-top-color: transparent;
+  border-radius: 50%;
+  animation: spin 0.6s linear infinite;
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+/* ═══════════════════════════════════════════════════════════════════
+   PLAY/PAUSE OVERLAY
+   ═══════════════════════════════════════════════════════════════════ */
+.play-pause-overlay {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(0, 0, 0, 0.2);
+  opacity: 0;
+  transition: opacity 0.3s ease;
+  pointer-events: none;
+  z-index: var(--z-overlay);
+}
+
+.play-pause-overlay.show {
+  opacity: 1;
+  animation: fadeOut 0.8s ease forwards;
+}
+
+@keyframes fadeOut {
+  0% { opacity: 1; }
+  70% { opacity: 1; }
+  100% { opacity: 0; }
+}
+
+.play-icon,
+.pause-icon {
+  font-size: 80px;
+  color: var(--text-primary);
+  text-shadow: 0 4px 16px rgba(0, 0, 0, 0.8);
+  animation: scaleIn 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+@keyframes scaleIn {
+  from {
+    transform: scale(0.5);
+    opacity: 0;
+  }
+  to {
+    transform: scale(1);
+    opacity: 1;
+  }
+}
+
+/* ═══════════════════════════════════════════════════════════════════
+   LOADING SKELETON
+   ═══════════════════════════════════════════════════════════════════ */
+.reel-skeleton {
+  position: relative;
+  width: 100vw;
+  height: 100vh;
+  background: linear-gradient(
+    90deg,
+    #0a0a0a 0%,
+    #151515 50%,
+    #0a0a0a 100%
+  );
+  background-size: 200% 100%;
+  animation: shimmer 1.5s infinite;
+}
+
+@keyframes shimmer {
+  0% { background-position: 200% 0; }
+  100% { background-position: -200% 0; }
+}
+
+/* ═══════════════════════════════════════════════════════════════════
+   RESPONSIVE DESIGN
+   ═══════════════════════════════════════════════════════════════════ */
+
+/* Desktop & Large Screens */
+@media (min-width: 1024px) {
+  .reels-container {
+    max-width: 600px;
+    margin: 0 auto;
+    border-left: 1px solid var(--border);
+    border-right: 1px solid var(--border);
+  }
+
+  .add-reel-btn {
+    padding: 18px 40px;
+    font-size: 18px;
+  }
+}
+
+/* Tablets */
+@media (max-width: 768px) {
+  .reel-info {
+    bottom: 80px;
+    left: 16px;
+    right: 80px;
+  }
+
+  .reel-actions {
+    right: 12px;
+    bottom: 100px;
+    gap: 16px;
+  }
+
+  .action-btn {
+    width: 50px;
+    height: 50px;
+    font-size: 22px;
+  }
+
+  .modal-content {
+    width: 95%;
+  }
+}
+
+/* Small Mobile */
+@media (max-width: 480px) {
+  .reel-avatar {
+    width: 38px;
+    height: 38px;
+    font-size: 16px;
+  }
+
+  .reel-username {
+    font-size: 14px;
+  }
+
+  .reel-caption {
+    font-size: 14px;
+  }
+
+  .action-btn {
+    width: 46px;
+    height: 46px;
+    font-size: 20px;
+  }
+
+  .add-reel-btn {
+    padding: 14px 24px;
+    font-size: 14px;
+  }
+
+  .plus-icon {
+    font-size: 24px;
+  }
+}
+
+/* ═══════════════════════════════════════════════════════════════════
+   UTILITY CLASSES
+   ═══════════════════════════════════════════════════════════════════ */
+.hidden {
+  display: none !important;
+}
+
+.no-scroll {
+  overflow: hidden !important;
+}
+
+/* Smooth Transitions */
+* {
+  -webkit-tap-highlight-color: transparent;
+  -webkit-touch-callout: none;
+}
+
+/* Better Touch Handling */
+button,
+.action-btn,
+.add-reel-btn {
+  -webkit-user-select: none;
+  user-select: none;
+  touch-action: manipulation;
+}
+
+/* Selection Style */
+::selection {
+  background: rgba(0, 255, 136, 0.3);
+  color: var(--text-primary);
+}
+
+::-moz-selection {
+  background: rgba(0, 255, 136, 0.3);
+  color: var(--text-primary);
 }
