@@ -4,8 +4,10 @@ import path from "path";
 // 1. Configure Storage
 const storage = multer.diskStorage({
   destination: (req, file, cb) => {
-    // Everything goes to the uploads folder as defined in your app.js
-    cb(null, "uploads/");
+    // Everything goes to the uploads folder in the project root
+    // Using an absolute-like path to avoid "src/uploads" confusion
+    const uploadPath = path.join(process.cwd(), "uploads");
+    cb(null, uploadPath);
   },
   filename: (_, file, cb) => {
     // Unique filename: timestamp + original extension
@@ -28,7 +30,7 @@ const fileFilter = (req, file, cb) => {
 };
 
 // 3. Export with Limits
-export default multer({ 
+export default multer({
   storage,
   fileFilter,
   limits: {
