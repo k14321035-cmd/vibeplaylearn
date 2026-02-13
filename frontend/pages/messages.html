@@ -9,8 +9,6 @@
 </head>
 
 <body>
- 
-
   <div class="messages-layout">
     <aside class="sidebar">
       <!-- Sidebar Header (User's Own Profile) -->
@@ -44,7 +42,7 @@
       <div id="noChatSelected" class="empty-state">
         <div class="empty-content">
           <div class="whatsapp-logo-placeholder">📱</div>
-          <h1>VIBE Messsanger</h1>
+          <h1>VIBE for Web</h1>
           <p>Send and receive messages without keeping your phone online.<br>Use VIBE on up to 4 linked devices and 1
             phone at the same time.</p>
           <div class="encryption-note">🔒 End-to-end encrypted</div>
@@ -90,12 +88,14 @@
     </main>
   </div>
 
+  <nav class="mobile-nav">
+    <button onclick="location.href='vibe.html'">🏠</button>
+    <button onclick="location.href='messages.html'" class="active">💬</button>
+    <button onclick="location.href='profile.html'">👤</button>
+    <button onclick="location.href='settings.html'">⚙️</button>
+  </nav>
 
   <script type="module" src="../scripts/features/messages/messages.js"></script>
 </body>
 
-
 </html>
-
-
-
