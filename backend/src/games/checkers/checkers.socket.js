@@ -1,71 +1,84 @@
 import { createGame, makeMove, checkWinner } from "./checkers.game.js";
 
-const checkersRooms = new Map();
-let waitingPlayer = null;
+const games = {};
 
-export const initCheckers = (io) => {
-    io.on("connection", (socket) => {
-        socket.on("findCheckersMatch", () => {
-            if (waitingPlayer && waitingPlayer.id !== socket.id) {
-                const roomId = `checkers-${waitingPlayer.id}-${socket.id}`;
-                const game = createGame();
+export const initCheckers = (io, socket) => {
+    // Create Room
+    socket.on("createRoom", ({ gameType }, callback) => {
+        if (gameType !== 'checkers') return;
 
-                const roomData = {
-                    game,
-                    players: {
-                        b: waitingPlayer.id, // Black starts
-                        r: socket.id
-                    }
-                };
+        const roomId = Math.random().toString(36).substring(7).toUpperCase();
 
-                checkersRooms.set(roomId, roomData);
-                socket.join(roomId);
-                waitingPlayer.join(roomId);
+        // createGame returns { board, turn: 'b', winner: null }
+        // We need to wrap it in our standard game object
+        const coreGame = createGame();
 
-                io.to(waitingPlayer.id).emit("checkersStart", {
-                    roomId,
-                    color: 'b',
-                    game
-                });
+        games[roomId] = {
+            roomId,
+            gameType,
+            players: [{ id: socket.id, symbol: 'b', username: 'Player 1' }], // First player is Black (starts)
+            ...coreGame,
+            status: 'waiting',
+            winner: null
+        };
 
-                io.to(socket.id).emit("checkersStart", {
-                    roomId,
-                    color: 'r',
-                    game
-                });
+        socket.join(roomId);
+        console.log(`[Checkers] Room ${roomId} created by ${socket.id}`);
 
-                waitingPlayer = null;
-            } else {
-                waitingPlayer = socket;
-                socket.emit("waitingForOpponent");
+        if (callback) callback({ roomId, gameType });
+
+        io.to(roomId).emit("gameUpdate", games[roomId]);
+    });
+
+    // Join Room
+    socket.on("joinRoom", ({ roomId }, callback) => {
+        const game = games[roomId];
+
+        if (!game) {
+            if (callback) callback({ error: "Room not found" });
+            return;
+        }
+
+        if (game.players.length >= 2) {
+            if (callback) callback({ error: "Room is full" });
+            return;
+        }
+
+        // Add second player
+        game.players.push({ id: socket.id, symbol: 'r', username: 'Player 2' }); // Second player is Red
+        game.status = 'playing';
+
+        socket.join(roomId);
+        console.log(`[Checkers] ${socket.id} joined room ${roomId}`);
+
+        if (callback) callback({ roomId, gameType: game.gameType });
+
+        io.to(roomId).emit("playerJoined", { players: game.players });
+        io.to(roomId).emit("gameUpdate", game);
+    });
+
+    // Make Move
+    socket.on("makeMove", ({ roomId, move }) => {
+        const game = games[roomId];
+        if (!game || game.status !== 'playing') return;
+
+        // Validate turn
+        if (game.turn === 'b' && game.players[0].id !== socket.id) return; // Black's turn (Player 1)
+        if (game.turn === 'r' && game.players[1].id !== socket.id) return; // Red's turn (Player 2)
+
+        // Execute move logic
+        // move should be { from: {r, c}, to: {r, c} }
+        const result = makeMove(game, move.from, move.to);
+
+        if (result) {
+            // Check win
+            const winnerColor = checkWinner(game);
+            if (winnerColor) {
+                game.status = 'finished';
+                game.winner = winnerColor === 'b' ? game.players[0].id : game.players[1].id;
             }
-        });
 
-        socket.on("checkersMove", ({ roomId, from, to }) => {
-            const room = checkersRooms.get(roomId);
-            if (!room) return;
-
-            if (room.players[room.game.turn] !== socket.id) return;
-
-            const moveResult = makeMove(room.game, from, to);
-            if (moveResult) {
-                room.game.winner = checkWinner(room.game);
-                io.to(roomId).emit("checkersUpdate", room.game);
-
-                if (room.game.winner) {
-                    checkersRooms.delete(roomId);
-                }
-            }
-        });
-
-        socket.on("disconnect", () => {
-            if (waitingPlayer === socket) waitingPlayer = null;
-            for (const [roomId, room] of checkersRooms) {
-                if (room.players.b === socket.id || room.players.r === socket.id) {
-                    io.to(roomId).emit("opponentLeft");
-                    checkersRooms.delete(roomId);
-                }
-            }
-        });
+            io.to(roomId).emit("gameUpdate", game);
+        }
     });
 };

@@ -1,111 +1,104 @@
-import { createGame, makeMove, getGameStatus } from "./chess.game.js";
+import { Chess } from 'chess.js';
 
-const chessRooms = new Map(); // roomId -> { game: ChessInstance, players: { w: socketId, b: socketId } }
-let waitingPlayer = null;
+const games = {};
 
-export const initChess = (io) => {
-    io.on("connection", (socket) => {
+export const initChess = (io, socket) => {
+    // Create Room
+    socket.on("createRoom", ({ gameType }, callback) => {
+        if (gameType !== 'chess') return;
 
-        // 1. Find Match
-        socket.on("findChessMatch", () => {
-            console.log(`♟️ User ${socket.id} looking for chess match...`);
+        const roomId = Math.random().toString(36).substring(7).toUpperCase();
+        const chess = new Chess();
 
-            if (waitingPlayer && waitingPlayer.id !== socket.id) {
-                // Match found!
-                const roomId = `chess-${waitingPlayer.id}-${socket.id}`;
-                const game = createGame();
+        games[roomId] = {
+            roomId,
+            gameType,
+            players: [{ id: socket.id, symbol: 'w', username: 'Player 1' }], // First player is White
+            board: chess.fen(),
+            turn: socket.id,
+            status: 'waiting',
+            winner: null,
+            chessInstance: chess // Store instance for logic
+        };
 
-                const roomData = {
-                    game,
-                    players: {
-                        w: waitingPlayer.id, // White
-                        b: socket.id         // Black
-                    },
-                    spectators: []
-                };
+        socket.join(roomId);
+        console.log(`[Chess] Room ${roomId} created by ${socket.id}`);
 
-                chessRooms.set(roomId, roomData);
+        if (callback) callback({ roomId, gameType });
 
-                // Join rooms
-                socket.join(roomId);
-                waitingPlayer.join(roomId);
+        io.to(roomId).emit("gameUpdate", sanitizeGame(games[roomId]));
+    });
 
-                // Notify White
-                io.to(waitingPlayer.id).emit("chessGameStart", {
-                    roomId,
-                    color: "w",
-                    fen: game.fen()
-                });
+    // Join Room
+    socket.on("joinRoom", ({ roomId }, callback) => {
+        const game = games[roomId];
 
-                // Notify Black
-                io.to(socket.id).emit("chessGameStart", {
-                    roomId,
-                    color: "b",
-                    fen: game.fen()
-                });
+        if (!game) {
+            if (callback) callback({ error: "Room not found" });
+            return;
+        }
 
-                waitingPlayer = null;
-                console.log(`✅ Chess match started: ${roomId}`);
+        if (game.players.length >= 2) {
+            if (callback) callback({ error: "Room is full" });
+            return;
+        }
 
-            } else {
-                // Wait for opponent
-                waitingPlayer = socket;
-                socket.emit("waitingForOpponent");
-            }
-        });
+        // Add second player
+        game.players.push({ id: socket.id, symbol: 'b', username: 'Player 2' }); // Second player is Black
+        game.status = 'playing';
 
-        // 2. Make Move
-        socket.on("chessMove", ({ roomId, move }) => {
-            const room = chessRooms.get(roomId);
-            if (!room) return;
+        socket.join(roomId);
+        console.log(`[Chess] ${socket.id} joined room ${roomId}`);
 
-            const { game, players } = room;
-            const color = game.turn(); // 'w' or 'b'
+        if (callback) callback({ roomId, gameType: game.gameType });
 
-            // Validate turn
-            if (players[color] !== socket.id) {
-                socket.emit("error", { message: "Not your turn!" });
-                return;
-            }
+        io.to(roomId).emit("playerJoined", { players: game.players });
+        io.to(roomId).emit("gameUpdate", sanitizeGame(game));
+    });
 
-            // Attempt move
-            const result = makeMove(game, move); // move: { from: 'e2', to: 'e4', promotion: 'q' }
+    // Make Move
+    socket.on("makeMove", ({ roomId, move }) => {
+        const game = games[roomId];
+        if (!game || game.status !== 'playing') return;
+
+        // Validate turn
+        if (game.turn !== socket.id) return;
+
+        const chess = game.chessInstance;
+
+        try {
+            const result = chess.move(move); // move: { from: 'e2', to: 'e4' } or 'e4' (SAN)
 
             if (result) {
-                // Move successful
-                io.to(roomId).emit("chessUpdate", {
-                    fen: game.fen(),
-                    lastMove: result
-                });
+                // Update board state
+                game.board = chess.fen();
 
-                // Check Game Over
-                const status = getGameStatus(game);
-                if (status !== "active") {
-                    let winner = null;
-                    if (status === "checkmate") {
-                        winner = color === "w" ? "w" : "b"; // The one who JUST moved wins
+                // Check game over conditions
+                if (chess.isGameOver()) {
+                    game.status = 'finished';
+                    if (chess.isCheckmate()) {
+                        game.winner = socket.id;
+                    } else {
+                        game.winner = 'draw';
                     }
-                    io.to(roomId).emit("chessGameOver", { status, winner });
-                    chessRooms.delete(roomId);
+                } else {
+                    // Switch turn
+                    const nextPlayer = game.players.find(p => p.id !== socket.id);
+                    if (nextPlayer) {
+                        game.turn = nextPlayer.id;
+                    }
                 }
-            } else {
-                socket.emit("error", { message: "Invalid move" });
-            }
-        });
 
-        // 3. Disconnect
-        socket.on("disconnect", () => {
-            if (waitingPlayer === socket) {
-                waitingPlayer = null;
+                io.to(roomId).emit("gameUpdate", sanitizeGame(game));
             }
-
-            // Handle active games
-            for (const [roomId, room] of chessRooms) {
-                if (room.players.w === socket.id || room.players.b === socket.id) {
-                    io.to(roomId).emit("opponentLeft");
-                    chessRooms.delete(roomId);
-                }
-            }
-        });
+        } catch (e) {
+            console.log('Invalid move:', e.message);
+        }
     });
+};
+
+const sanitizeGame = (game) => {
+    // Return game state without the complex chessInstance object
+    const { chessInstance, ...rest } = game;
+    return rest;
 };

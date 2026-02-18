@@ -52,11 +52,16 @@ export const getChatList = async (req, res) => {
     {
       $project: {
         _id: 0,
-        userId: "$user._id",
-        username: "$user.username",
-        avatar: "$user.avatar",
-        lastMessage: 1,
-        unread: 1,
+        user: {
+          _id: "$user._id",
+          username: "$user.username",
+          profilePicture: "$user.avatar"
+        },
+        lastMessage: {
+          text: "$lastMessage",
+          createdAt: "$lastAt"
+        },
+        unreadCount: "$unread",
         lastAt: 1
       }
     },

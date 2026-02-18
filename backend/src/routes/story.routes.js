@@ -1,9 +1,13 @@
 import express from "express";
-import { uploadStory, getFeedStories } from "../controllers/story.controller.js";
-import { protect } from "../middleware/auth.middleware.js"; // Use your existing auth
-import upload from "../middleware/upload.js"; // Use the multer config we created
+import { uploadStory, getFeedStories, deleteAllStories, deleteStory } from "../controllers/story.controller.js";
+import { auth } from "../middleware/auth.middleware.js";
+import upload from "../middleware/upload.js";
+
 const router = express.Router();
-router.get("/feed", protect, getFeedStories);
-router.post("/", protect, upload.single("image"), uploadStory);
+
+router.get("/feed", auth, getFeedStories);
+router.post("/", auth, upload.single("image"), uploadStory);
+router.delete("/all", auth, deleteAllStories);
+router.delete("/:id", auth, deleteStory);
 
 export default router;

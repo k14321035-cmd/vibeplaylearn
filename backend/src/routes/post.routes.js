@@ -1,7 +1,7 @@
 import express from "express";
 import Post from "../models/Post.js";
 import Comment from "../models/comment.model.js";
-import {auth} from "../middleware/auth.middleware.js";
+import { auth } from "../middleware/auth.middleware.js";
 import upload from "../middleware/upload.js";
 import { adminOnly } from "../middleware/admin.middleware.js";
 
@@ -18,23 +18,23 @@ router.post(
     console.log("req.file:", req.file);
 
     if (!req.user) {
-        console.error("CRITICAL: req.user is MISSING in route handler despite auth middleware!");
-        return res.status(500).json({ message: "Internal Auth Error" });
+      console.error("CRITICAL: req.user is MISSING in route handler despite auth middleware!");
+      return res.status(500).json({ message: "Internal Auth Error" });
     }
 
     try {
-        const post = await Post.create({
-          user: req.user._id, // explicit _id
-          caption: req.body.caption,
-          image: req.file
-            ? `/uploads/${req.file.filename}`
-            : null
-        });
+      const post = await Post.create({
+        user: req.user._id, // explicit _id
+        caption: req.body.caption,
+        image: req.file
+          ? `/uploads/${req.file.filename}`
+          : null
+      });
 
-        res.status(201).json(post);
+      res.status(201).json(post);
     } catch (error) {
-        console.error("POST CREATION ERROR:", error);
-        res.status(400).json({ message: error.message });
+      console.error("POST CREATION ERROR:", error);
+      res.status(400).json({ message: error.message });
     }
   }
 );
@@ -45,7 +45,7 @@ router.get("/", auth, async (req, res) => {
       .populate("user", "username fullName avatar")
       .sort({ createdAt: -1 });
 
-      res.json(posts);
+    res.json(posts);
   } catch (err) {
     console.error(err);
     res.status(500).json({ message: "Server Error" });
@@ -144,5 +144,9 @@ router.delete(
     }
   }
 );
+
+router.delete("/:id", auth, async (req, res) => {
+  await import("../controllers/post.controller.js").then((mod) => mod.deletePost(req, res));
+});
 
 export default router;

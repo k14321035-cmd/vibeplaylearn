@@ -28,7 +28,7 @@ export const getFeedStories = async (req, res) => {
   try {
     // Logic: Fetch stories from the user and their following list
     // For now, let's fetch all active stories to test
-    const stories = await Story.find().populate("owner", "username profilePic");
+    const stories = await Story.find().populate("owner", "username avatar");
     res.status(200).json(stories);
   } catch (error) {
     res.status(500).json({ error: error.message });
@@ -39,6 +39,27 @@ export const deleteAllStories = async (req, res) => {
   try {
     await Story.deleteMany({});
     res.status(200).json({ message: "All stories deleted successfully" });
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+};
+
+export const deleteStory = async (req, res) => {
+  try {
+    const story = await Story.findById(req.params.id);
+
+    if (!story) {
+      return res.status(404).json({ message: "Story not found" });
+    }
+
+    // 🔒 OWNER CHECK OR ADMIN
+    if (story.owner.toString() !== req.user.id && req.user.role !== 'admin') {
+      return res.status(403).json({ message: "Not authorized" });
+    }
+
+    await story.deleteOne();
+
+    res.status(200).json({ message: "Story deleted successfully" });
   } catch (error) {
     res.status(500).json({ error: error.message });
   }

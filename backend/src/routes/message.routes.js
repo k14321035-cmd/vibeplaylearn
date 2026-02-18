@@ -8,10 +8,14 @@ import {
 
 const router = express.Router();
 
-// Defined BEFORE parametric routes to avoid conflict
-router.get("/chatlist", protect, getChatList);
+// Static routes BEFORE dynamic routes
+router.get("/conversations", protect, getChatList); // Mapped /conversations to getChatList
+router.get("/chatlist", protect, getChatList); // Keep original just in case
 
+// Dynamic routes
 router.get("/:userId", protect, getMessagesWithUser);
 router.post("/:userId", protect, sendMessage);
+// If app uses /send/:id, we need a route for that, or update app to use /:id
+router.post("/send/:userId", protect, sendMessage);
 
 export default router;

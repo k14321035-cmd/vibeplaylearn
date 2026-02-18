@@ -29,7 +29,7 @@ export const getAllPosts = async (req, res) => {
   try {
     // Fetch posts and populate the author's name/avatar
     const posts = await Post.find()
-      .populate("author", "fullName username profilePic") 
+      .populate("author", "fullName username profilePic")
       .sort({ createdAt: -1 }); // Newest first
 
     res.status(200).json(posts);
@@ -57,8 +57,8 @@ export const deletePost = async (req, res) => {
       return res.status(404).json({ message: "Post not found" });
     }
 
-    // 🔒 OWNER CHECK
-    if (post.user.toString() !== req.user.id) {
+    // 🔒 OWNER CHECK OR ADMIN
+    if (post.user.toString() !== req.user.id && req.user.role !== 'admin') {
       return res.status(403).json({ message: "Not authorized" });
     }
 

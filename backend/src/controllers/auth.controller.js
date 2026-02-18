@@ -114,3 +114,59 @@ export const getUserById = async (req, res) => {
     res.status(500).json({ message: "Server error" });
   }
 };
+
+/* =========================
+   FOLLOW USER
+   ========================= */
+export const followUser = async (req, res) => {
+  if (req.user._id.toString() === req.params.id) {
+    return res.status(400).json({ message: "You cannot follow yourself" });
+  }
+
+  try {
+    const user = await User.findById(req.params.id);
+    const currentUser = await User.findById(req.user._id);
+
+    if (!user) {
+      return res.status(404).json({ message: "User not found" });
+    }
+
+    if (!user.followers.includes(req.user._id)) {
+      await user.updateOne({ $push: { followers: req.user._id } });
+      await currentUser.updateOne({ $push: { following: req.params.id } });
+      res.status(200).json({ message: "User followed" });
+    } else {
+      res.status(403).json({ message: "You already follow this user" });
+    }
+  } catch (err) {
+    res.status(500).json(err);
+  }
+};
+
+/* =========================
+   UNFOLLOW USER
+   ========================= */
+export const unfollowUser = async (req, res) => {
+  if (req.user._id.toString() === req.params.id) {
+    return res.status(400).json({ message: "You cannot unfollow yourself" });
+  }
+
+  try {
+    const user = await User.findById(req.params.id);
+    const currentUser = await User.findById(req.user._id);
+
+    if (!user) {
+      return res.status(404).json({ message: "User not found" });
+    }
+
+    if (user.followers.includes(req.user._id)) {
+      await user.updateOne({ $pull: { followers: req.user._id } });
+      await currentUser.updateOne({ $pull: { following: req.params.id } });
+      res.status(200).json({ message: "User unfollowed" });
+    } else {
+      res.status(403).json({ message: "You dont follow this user" });
+    }
+  } catch (err) {
+    res.status(500).json(err);
+  }
+};

@@ -14,8 +14,10 @@ import postRoutes from "./routes/post.routes.js";
 import reelRoutes from "./routes/reel.routes.js";
 import messageRoutes from "./routes/message.routes.js";
 import storyRoutes from "./routes/story.routes.js";
+import gamesRoutes from "./routes/games.routes.js";
 import Message from "./models/message.model.js";
 import notificationRoutes from "./routes/notification.routes.js";
+import tournamentRoutes from "./routes/tournament.routes.js";
 import { initTicTacToe } from "./games/tictactoe/ttt.socket.js";
 import { initChess } from "./games/chess/chess.socket.js";
 import { initCheckers } from "./games/checkers/checkers.socket.js";
@@ -45,9 +47,11 @@ app.use("/api/post", postRoutes);
 app.use("/api/posts", postRoutes);
 app.use("/api/reels", reelRoutes);
 app.use("/api/messages", messageRoutes);
-app.use("/uploads", express.static(path.join(__dirname, "../uploads")));
+app.use("/uploads", express.static(path.join(__dirname, "uploads")));
 app.use("/api/stories", storyRoutes);
 app.use("/api/notifications", notificationRoutes);
+app.use("/api/games", gamesRoutes);
+app.use("/api/tournaments", tournamentRoutes);
 
 // SERVE FRONTEND (STATIC FILES)
 // Go up two levels from "backend/src" to "f:/website/zimig" then into "frontend"
@@ -80,7 +84,10 @@ io.on("connection", socket => {
     if (!senderId || !receiverId || !text) return;
 
     const message = await Message.create({ sender: senderId, receiver: receiverId, text });
-    const populated = await message.populate("sender", "username");
+    const populated = await message.populate([
+      { path: "sender", select: "username avatar fullname" },
+      { path: "receiver", select: "username avatar fullname" }
+    ]);
 
     io.to(receiverId).emit("newMessage", populated);
     io.to(senderId).emit("newMessage", populated);
