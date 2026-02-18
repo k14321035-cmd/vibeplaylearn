@@ -175,6 +175,7 @@ socket.on("checkersStart", (data) => {
 });
 
 socket.on("checkersUpdate", (updatedGame) => {
+    // Only update if someone else's move or game ended
     game = updatedGame;
     updateUI();
     moveAudio.play().catch(() => { });

@@ -45,7 +45,7 @@ async function loadUserSettings() {
         if (!res.ok) throw new Error("Unauthorized");
 
         const user = await res.json();
-        
+
         // Fill the inputs
         usernameInput.value = user.username;
         emailInput.value = user.email;
